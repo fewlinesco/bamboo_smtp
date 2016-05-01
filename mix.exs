@@ -16,7 +16,7 @@ defmodule BambooSmtp.Mixfile do
      test_coverage: [tool: ExCoveralls],
      package: package,
      deps: deps,
-     docs: [main: "readme", extras: ["README.md"]]]
+     docs: [main: "README", extras: ["README.md"]]]
   end
 
   def application do
