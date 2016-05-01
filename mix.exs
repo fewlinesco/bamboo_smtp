@@ -5,7 +5,7 @@ defmodule BambooSmtp.Mixfile do
 
   def project do
     [app: :bamboo_smtp,
-     version: "0.0.1",
+     version: "0.0.2",
      elixir: "~> 1.2",
      source_url: @project_url,
      homepage_url: @project_url,
