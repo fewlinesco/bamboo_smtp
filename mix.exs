@@ -15,7 +15,8 @@ defmodule BambooSmtp.Mixfile do
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
      package: package,
-     deps: deps]
+     deps: deps,
+     docs: [main: "readme", extras: ["README.md"]]]
   end
 
   def application do
