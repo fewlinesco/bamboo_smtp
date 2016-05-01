@@ -121,7 +121,7 @@ defmodule Bamboo.SMTPAdapter do
     add_smtp_header_line(body, "MIME-Version", "1.0")
   end
 
-  def add_multipart_delimiter(body, delimiter) do
+  defp add_multipart_delimiter(body, delimiter) do
     add_smtp_line(body, "--#{delimiter}")
   end
 
