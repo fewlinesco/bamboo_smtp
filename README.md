@@ -1,3 +1,6 @@
+[![Circle CI](https://circleci.com/gh/fewlinesco/bamboo_smtp.svg?style=svg)](https://circleci.com/gh/fewlinesco/bamboo_smtp)
+[![Coverage Status](https://coveralls.io/repos/github/fewlinesco/bamboo_smtp/badge.svg?branch=master)](https://coveralls.io/github/fewlinesco/bamboo_smtp?branch=master)
+
 # Bamboo.SMTPAdapter
 
 An Adapter for the [Bamboo](https://github.com/thoughtbot/bamboo) email app.
