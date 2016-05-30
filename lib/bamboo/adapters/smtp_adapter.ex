@@ -110,6 +110,7 @@ defmodule Bamboo.SMTPAdapter do
     |> add_multipart_delimiter(multi_part_delimiter)
     |> add_smtp_header_line("Content-Type", "text/html;charset=UTF-8")
     |> add_smtp_header_line("Content-ID", "html-body")
+    |> add_smtp_line("")
     |> add_smtp_line(html_body)
   end
 
@@ -154,6 +155,7 @@ defmodule Bamboo.SMTPAdapter do
     |> add_multipart_delimiter(multi_part_delimiter)
     |> add_smtp_header_line("Content-Type", "text/plain;charset=UTF-8")
     |> add_smtp_header_line("Content-ID", "text-body")
+    |> add_smtp_line("")
     |> add_smtp_line(text_body)
   end
 
