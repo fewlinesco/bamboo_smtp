@@ -44,9 +44,9 @@ The package can be installed as:
 
 ## Contributing
 
-Before opening a pull request, please open an issue first.
+Before opening a pull request you can open an issue if you have any question or need some guidance.
 
-Once we've decided how to move forward with a pull request:
+Here's how to setup the project:
 
 ```
 $ git clone https://github.com/fewlinesco/bamboo_smtp.git
@@ -55,4 +55,4 @@ $ mix deps.get
 $ mix test
 ```
 
-Once you've made your additions and mix test passes, go ahead and open a PR!
+Once you've made your additions and `mix test` passes, go ahead and open a Pull Request.
