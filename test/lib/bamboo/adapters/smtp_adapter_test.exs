@@ -26,7 +26,7 @@ defmodule Bamboo.SMTPAdapterTest do
     def handle_call({:send_email, {email, config}}, _from, state) do
       case check_validity(email, config) do
         :ok ->
-          {:reply, :ok, [{email, config}|state]}
+          {:reply, :ok, [{email, config} | state]}
         error ->
           {:reply, error, state}
       end
