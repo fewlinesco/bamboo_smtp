@@ -56,3 +56,7 @@ $ mix test
 ```
 
 Once you've made your additions and `mix test` passes, go ahead and open a Pull Request.
+
+## License
+
+Bamboo SMTPAdapter is released under [The MIT License (MIT)](https://opensource.org/licenses/MIT).
