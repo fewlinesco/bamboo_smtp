@@ -5,7 +5,7 @@ defmodule BambooSmtp.Mixfile do
 
   def project do
     [app: :bamboo_smtp,
-     version: "0.0.2",
+     version: "1.0.0",
      elixir: "~> 1.2",
      source_url: @project_url,
      homepage_url: @project_url,
@@ -36,7 +36,7 @@ defmodule BambooSmtp.Mixfile do
 
   defp package do
     [
-      maintainers: ["Kevin Disneur"],
+      maintainers: ["Kevin Disneur", "Thomas Gautier"],
       licenses: ["MIT"],
       links: %{"GitHub" => @project_url}
     ]
