@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/fewlinesco/bamboo_smtp.svg?style=svg)](https://circleci.com/gh/fewlinesco/bamboo_smtp)
+[![Build Status](https://travis-ci.org/fewlinesco/bamboo_smtp.svg?branch=master)](https://travis-ci.org/fewlinesco/bamboo_smtp)
 [![Coverage Status](https://coveralls.io/repos/github/fewlinesco/bamboo_smtp/badge.svg?branch=master)](https://coveralls.io/github/fewlinesco/bamboo_smtp?branch=master)
 
 # Bamboo.SMTPAdapter
