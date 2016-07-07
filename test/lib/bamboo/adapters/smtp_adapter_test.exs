@@ -81,6 +81,20 @@ defmodule Bamboo.SMTPAdapterTest do
     }
   ]
 
+  @email_in_utf8 [
+    from: {"John Doe", "john@doe.com"},
+    to: [{"Jane Doe", "jane@doe.com"}],
+    cc: [{"Richard Roe", "richard@roe.com"}],
+    bcc: [{"Mary Major", "mary@major.com"},
+          {"Joe Major", "joe@major.com"}],
+    subject: "日本語のｓｕｂｊｅｃｔ",
+    html_body: "<h1>Bamboo is awesome!</h1>",
+    text_body: "*Bamboo is awesome!*",
+    headers: %{
+      "Reply-To" => "reply@doe.com"
+    }
+  ]
+
   setup do
     FakeGenSMTP.start_link
 
@@ -184,7 +198,9 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc) == to
 
-    assert String.contains?(raw_email, "Subject: #{bamboo_email.subject}\r\n")
+    rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
+    assert String.contains?(raw_email, rfc822_subject)
+
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
     assert String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
@@ -223,7 +239,9 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc) == to
 
-    assert String.contains?(raw_email, "Subject: #{bamboo_email.subject}\r\n")
+    rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
+    assert String.contains?(raw_email, rfc822_subject)
+
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
     assert String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
@@ -262,7 +280,9 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc) == to
 
-    assert String.contains?(raw_email, "Subject: #{bamboo_email.subject}\r\n")
+    rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
+    assert String.contains?(raw_email, rfc822_subject)
+
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
     assert String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
@@ -282,6 +302,23 @@ defmodule Bamboo.SMTPAdapterTest do
 
     assert_configuration bamboo_config, gen_smtp_config
   end
+
+
+  test "check rfc822 encoding for subject" do
+    bamboo_email = @email_in_utf8
+    |> Email.new_email
+    |> Bamboo.Mailer.normalize_addresses
+
+    bamboo_config = configuration
+
+    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    [{{_from, _to, raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    rfc822_subject = "Subject: =?UTF-8?B?5pel5pys6Kqe44Gu772T772V772C772K772F772D772U?=\r\n"
+    assert String.contains?(raw_email, rfc822_subject)
+  end
+
 
   defp format_email({name, email}), do: "<#{email}> #{name}"
   defp format_email(emails) when is_list(emails) do

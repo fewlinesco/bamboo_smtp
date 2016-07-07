@@ -143,7 +143,11 @@ defmodule Bamboo.SMTPAdapter do
   defp add_smtp_line(body, content), do: body <> content <> "\r\n"
 
   defp add_subject(body, %Bamboo.Email{subject: subject}) do
-    add_smtp_header_line(body, :subject, subject)
+    add_smtp_header_line(body, :subject, rfc822_encode(subject))
+  end
+
+  defp rfc822_encode(content) do
+    "=?UTF-8?B?#{Base.encode64(content)}?="
   end
 
   defp add_text_body(body, %Bamboo.Email{text_body: text_body}, _multi_part_delimiter)
