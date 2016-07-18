@@ -1,14 +1,18 @@
 # CHANGELOG
 
-## master
+## 1.1.0 - 2016-07-18
 
 ### New Additions
 
-* Bump `gen_smtp` to `0.11.0` (from `0.10.0`)
-* Support Elixir `1.3.0`
-* Support Erlang `19.0`
+* Subject is now encoded to conform to RFC822 ([#15])
+* Bump `gen_smtp` to `0.11.0` (from `0.10.0`) ([#13])
+* Support Elixir `1.3.0` ([#13])
+* Support Erlang `19.0` ([#13])
 
-## 1.0.0
+[#15]: https://github.com/fewlinesco/bamboo_smtp/pull/15
+[#13]: https://github.com/fewlinesco/bamboo_smtp/pull/13
+
+## 1.0.0 - 2016-06-14
 
 ### New Additions
 
