@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## master
+
+### New Additions
+
+* Bump `gen_smtp` to `0.11.0` (from `0.10.0`)
+* Support Elixir `1.3.0`
+* Support Erlang `19.0`
+
 ## 1.0.0
 
 ### New Additions
