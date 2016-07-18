@@ -17,11 +17,11 @@ The package can be installed as:
   end
   ```
 
-2. Add `bamboo` to your list of applications in `mix.exs`:
+2. Add `bamboo` and `bamboo_smtp` to your list of applications in `mix.exs`:
 
   ```elixir
   def application do
-    [applications: [:bamboo]]
+    [applications: [:bamboo, :bamboo_smtp]]
   end
   ```
 
