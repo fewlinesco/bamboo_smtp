@@ -49,7 +49,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
     defp check_email({from, _to, _raw}) do
       case from do
-        "<wrong@user.com> Wrong User" ->
+        "Wrong User<wrong@user.com>" ->
           {:error, :no_more_hosts, {:permanent_failure,
                                     "an-smtp-adddress", "554 Message rejected: Email address is not verified.\r\n"}}
         _ ->
@@ -320,7 +320,7 @@ defmodule Bamboo.SMTPAdapterTest do
   end
 
 
-  defp format_email({name, email}), do: "<#{email}> #{name}"
+  defp format_email({name, email}), do: "#{name}<#{email}>"
   defp format_email(emails) when is_list(emails) do
     emails |> Enum.map(&format_email/1)
   end
