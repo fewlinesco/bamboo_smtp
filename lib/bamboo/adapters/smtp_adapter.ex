@@ -212,7 +212,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp format_email({nil, email}), do: email
-  defp format_email({name, email}), do: "<#{email}> #{name}"
+  defp format_email({name, email}), do: "#{name}<#{email}>"
   defp format_email(emails) when is_list(emails) do
     Enum.map(emails, &format_email/1)
   end
