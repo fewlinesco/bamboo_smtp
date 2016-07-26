@@ -209,12 +209,10 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
     assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/html;charset=UTF-8\r\n" <>
-                                        "Content-ID: html-body\r\n" <>
                                         "\r\n" <>
                                         "#{bamboo_email.html_body}\r\n")
     refute String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/plain;charset=UTF-8\r\n" <>
-                                        "Content-ID: text-body\r\n" <>
                                         "\r\n")
 
     assert_configuration bamboo_config, gen_smtp_config
@@ -250,11 +248,9 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
     refute String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/html;charset=UTF-8\r\n" <>
-                                        "Content-ID: html-body\r\n" <>
                                         "\r\n")
     assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/plain;charset=UTF-8\r\n" <>
-                                        "Content-ID: text-body\r\n" <>
                                         "\r\n" <>
                                         "#{bamboo_email.text_body}\r\n")
 
@@ -291,12 +287,10 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
     assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/html;charset=UTF-8\r\n" <>
-                                        "Content-ID: html-body\r\n" <>
                                         "\r\n" <>
                                         "#{bamboo_email.html_body}\r\n")
     assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/plain;charset=UTF-8\r\n" <>
-                                        "Content-ID: text-body\r\n" <>
                                         "\r\n" <>
                                         "#{bamboo_email.text_body}\r\n")
 
