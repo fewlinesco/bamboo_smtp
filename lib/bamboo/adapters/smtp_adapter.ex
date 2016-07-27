@@ -12,8 +12,8 @@ defmodule Bamboo.SMTPAdapter do
         adapter: Bamboo.SMTPAdapter,
         server: "smtp.domain",
         port: 1025,
-        username: "your.name@your.domain",
-        password: "pa55word",
+        username: "your.name@your.domain", # or {:system, "SMTP_USER"}
+        password: "pa55word", # or {:system, "SMTP_PASS"}
         tls: :if_available, # can be `:always` or `:never`
         ssl: :false, # can be `:true`
         retries: 1
@@ -287,8 +287,14 @@ defmodule Bamboo.SMTPAdapter do
   defp to_gen_smtp_server_config({:server, value}, config) do
     [{:relay, value} | config]
   end
+  defp to_gen_smtp_server_config({:username, {:system, var}}, config) do
+    [{:username, System.get_env(var)} | config]
+  end
   defp to_gen_smtp_server_config({:username, value}, config) do
     [{:username, value} | config]
+  end
+  defp to_gen_smtp_server_config({:password, {:system, var}}, config) do
+    [{:password, System.get_env(var)} | config]
   end
   defp to_gen_smtp_server_config({:password, value}, config) do
     [{:password, value} | config]

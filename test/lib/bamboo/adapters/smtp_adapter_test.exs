@@ -161,6 +161,21 @@ defmodule Bamboo.SMTPAdapterTest do
     assert retries == 42
   end
 
+  test "sets username and password from System when specified" do
+    System.put_env("SMTP_USER", "joeblow")
+    System.put_env("SMTP_PASS", "fromkokomo")
+
+    bamboo_email = new_email
+    bamboo_config = configuration(%{username: {:system, "SMTP_USER"}, password: {:system, "SMTP_PASS"}})
+
+    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert  gen_smtp_config[:username] == "joeblow"
+    assert gen_smtp_config[:password] == "fromkokomo"
+  end
+
   test "emails raise an exception when configuration is wrong" do
     bamboo_email = new_email
     bamboo_config = configuration(%{server: "wrong.smtp.domain"})
@@ -302,7 +317,6 @@ defmodule Bamboo.SMTPAdapterTest do
 
     assert_configuration bamboo_config, gen_smtp_config
   end
-
 
   test "check rfc822 encoding for subject" do
     bamboo_email = @email_in_utf8
