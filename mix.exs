@@ -27,8 +27,8 @@ defmodule BambooSmtp.Mixfile do
     [
       {:bamboo, "~> 0.6.0"},
       {:gen_smtp, "~> 0.11.0"},
-      {:ex_doc, "~> 0.12.0", only: :dev},
-      {:earmark, ">= 0.0.0", only: :dev},
+      {:ex_doc, "~> 0.13.0", only: :dev},
+      {:earmark, ">= 1.0.1", only: :dev},
       {:dogma, "~> 0.1", only: [:dev, :test]},
       {:excoveralls, "~> 0.4", only: :test},
     ]
