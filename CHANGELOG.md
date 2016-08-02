@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 1.2.0 - 2016-08-02
+
+* Fix order of name/email in `format_email` function ([#22])
+* Allow username and password configs to be loaded from ENV ([#23])
+* Remove Content-ID SMTP header from email parts ([#24])
+* Bump to Elixir 1.3.2 ([#26])
+* Update to bamboo 0.7.0 ([#27])
+
+[#22]: https://github.com/fewlinesco/bamboo_smtp/pull/22
+[#23]: https://github.com/fewlinesco/bamboo_smtp/pull/23
+[#24]: https://github.com/fewlinesco/bamboo_smtp/pull/24
+[#26]: https://github.com/fewlinesco/bamboo_smtp/pull/26
+[#27]: https://github.com/fewlinesco/bamboo_smtp/pull/27
+
 ## 1.1.0 - 2016-07-18
 
 ### New Additions

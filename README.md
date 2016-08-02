@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/fewlinesco/bamboo_smtp.svg?branch=master)](https://travis-ci.org/fewlinesco/bamboo_smtp)
-[![Coverage Status](https://coveralls.io/repos/github/fewlinesco/bamboo_smtp/badge.svg?branch=master)](https://coveralls.io/github/fewlinesco/bamboo_smtp?branch=master)
 
 # Bamboo.SMTPAdapter
 
@@ -13,7 +12,7 @@ The package can be installed as:
 
   ```elixir
   def deps do
-    [{:bamboo_smtp, "~> 1.1.0"}]
+    [{:bamboo_smtp, "~> 1.2.0"}]
   end
   ```
 
