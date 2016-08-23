@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.2.1 - 2016-08-23
+
+* Fix From/To headers passed to gen_smtp not to be formated that caused an error with some SMTP cloud providers like Amazon SES ([#31])
+
+[#31]: https://github.com/fewlinesco/bamboo_smtp/pull/31
+
 ## 1.2.0 - 2016-08-02
 
 * Fix order of name/email in `format_email` function ([#22])
