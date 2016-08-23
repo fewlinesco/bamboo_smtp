@@ -209,16 +209,17 @@ defmodule Bamboo.SMTPAdapter do
     |> raise_on_missing_configuration(config)
   end
 
-  defp format_email({nil, email}), do: email
-  defp format_email({name, email}), do: "#{name}<#{email}>"
-  defp format_email(emails) when is_list(emails) do
-    Enum.map(emails, &format_email/1)
+  defp format_email({nil, email}, _format), do: email
+  defp format_email({name, email}, true), do: "#{name} <#{email}>"
+  defp format_email({_name, email}, false), do: email
+  defp format_email(emails, format) when is_list(emails) do
+    Enum.map(emails, &format_email(&1, format))
   end
 
-  defp format_email(email, type) do
+  defp format_email(email, type, format \\ true) do
     email
     |> Bamboo.Formatter.format_email_address(type)
-    |> format_email
+    |> format_email(format)
   end
 
   defp format_email_as_string(emails) when is_list(emails) do
@@ -234,9 +235,9 @@ defmodule Bamboo.SMTPAdapter do
     |> format_email_as_string
   end
 
-  defp from(%Bamboo.Email{from: from}) do
+  defp from_without_format(%Bamboo.Email{from: from}) do
     from
-    |> format_email(:from)
+    |> format_email(:from, false)
   end
 
   defp put_default_configuration(config) do
@@ -268,14 +269,14 @@ defmodule Bamboo.SMTPAdapter do
     """
   end
 
-  defp to(%Bamboo.Email{} = email) do
+  defp to_without_format(%Bamboo.Email{} = email) do
     email
     |> Bamboo.Email.all_recipients
-    |> format_email(:to)
+    |> format_email(:to, false)
   end
 
   defp to_gen_smtp_message(%Bamboo.Email{} = email) do
-    {from(email), to(email), body(email)}
+    {from_without_format(email), to_without_format(email), body(email)}
   end
 
   defp to_gen_smtp_server_config(config) do

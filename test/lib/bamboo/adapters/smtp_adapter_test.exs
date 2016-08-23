@@ -49,7 +49,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
     defp check_email({from, _to, _raw}) do
       case from do
-        "Wrong User<wrong@user.com>" ->
+        "wrong@user.com" ->
           {:error, :no_more_hosts, {:permanent_failure,
                                     "an-smtp-adddress", "554 Message rejected: Email address is not verified.\r\n"}}
         _ ->
@@ -210,8 +210,8 @@ defmodule Bamboo.SMTPAdapterTest do
         raw_email,
         capture: :all_but_first)
 
-    assert format_email_as_string(bamboo_email.from) == from
-    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc) == to
+    assert format_email_as_string(bamboo_email.from, false) == from
+    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
     rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
     assert String.contains?(raw_email, rfc822_subject)
@@ -249,8 +249,8 @@ defmodule Bamboo.SMTPAdapterTest do
         raw_email,
         capture: :all_but_first)
 
-    assert format_email_as_string(bamboo_email.from) == from
-    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc) == to
+    assert format_email_as_string(bamboo_email.from, false) == from
+    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
     rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
     assert String.contains?(raw_email, rfc822_subject)
@@ -288,8 +288,8 @@ defmodule Bamboo.SMTPAdapterTest do
         raw_email,
         capture: :all_but_first)
 
-    assert format_email_as_string(bamboo_email.from) == from
-    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc) == to
+    assert format_email_as_string(bamboo_email.from, false) == from
+    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
     rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
     assert String.contains?(raw_email, rfc822_subject)
@@ -327,17 +327,19 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, rfc822_subject)
   end
 
+  defp format_email(emails), do: format_email(emails, true)
 
-  defp format_email({name, email}), do: "#{name}<#{email}>"
-  defp format_email(emails) when is_list(emails) do
-    emails |> Enum.map(&format_email/1)
+  defp format_email({name, email}, true), do: "#{name} <#{email}>"
+  defp format_email({_name, email}, false), do: email
+  defp format_email(emails, format) when is_list(emails) do
+    emails |> Enum.map(&format_email_as_string(&1, format))
   end
 
   defp format_email_as_string(emails) when is_list(emails) do
     emails |> format_email |> Enum.join(", ")
   end
-  defp format_email_as_string(email) do
-    format_email(email)
+  defp format_email_as_string(email, format \\ true) do
+    format_email(email, format)
   end
 
   defp assert_configuration(bamboo_config, gen_smtp_config) do
