@@ -181,7 +181,7 @@ defmodule Bamboo.SMTPAdapter do
   defp generate_multi_part_delimiter, do: "----=_Part_123456789_987654321.192837465"
 
   defp body(%Bamboo.Email{} = email) do
-    multi_part_delimiter = generate_multi_part_delimiter
+    multi_part_delimiter = generate_multi_part_delimiter()
 
     ""
     |> add_subject(email)
