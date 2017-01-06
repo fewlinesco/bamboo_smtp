@@ -178,7 +178,10 @@ defmodule Bamboo.SMTPAdapter do
     Map.put_new(config, key, default_value)
   end
 
-  defp generate_multi_part_delimiter, do: "----=_Part_123456789_987654321.192837465"
+  defp generate_multi_part_delimiter do
+    << random1 :: size(32), random2 :: size(32), random3 :: size(32) >> = :crypto.strong_rand_bytes(12)
+    "----=_Part_#{random1}_#{random2}.#{random3}"
+  end
 
   defp body(%Bamboo.Email{} = email) do
     multi_part_delimiter = generate_multi_part_delimiter()
