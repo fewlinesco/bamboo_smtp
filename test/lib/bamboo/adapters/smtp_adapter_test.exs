@@ -114,7 +114,7 @@ defmodule Bamboo.SMTPAdapterTest do
   end
 
   test "sets default tls key if not present" do
-    %{tls: tls} = SMTPAdapter.handle_config(configuration)
+    %{tls: tls} = SMTPAdapter.handle_config(configuration())
 
     assert :if_available == tls
   end
@@ -126,7 +126,7 @@ defmodule Bamboo.SMTPAdapterTest do
   end
 
   test "sets default ssl key if not present" do
-    %{ssl: ssl} = SMTPAdapter.handle_config(configuration)
+    %{ssl: ssl} = SMTPAdapter.handle_config(configuration())
 
     refute ssl
   end
@@ -138,7 +138,7 @@ defmodule Bamboo.SMTPAdapterTest do
   end
 
   test "sets default retries key if not present" do
-    %{retries: retries} = SMTPAdapter.handle_config(configuration)
+    %{retries: retries} = SMTPAdapter.handle_config(configuration())
 
     assert retries == 1
   end
@@ -153,7 +153,7 @@ defmodule Bamboo.SMTPAdapterTest do
     System.put_env("SMTP_USER", "joeblow")
     System.put_env("SMTP_PASS", "fromkokomo")
 
-    bamboo_email = new_email
+    bamboo_email = new_email()
     bamboo_config = configuration(%{username: {:system, "SMTP_USER"}, password: {:system, "SMTP_PASS"}})
 
     :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
@@ -165,7 +165,7 @@ defmodule Bamboo.SMTPAdapterTest do
   end
 
   test "emails raise an exception when configuration is wrong" do
-    bamboo_email = new_email
+    bamboo_email = new_email()
     bamboo_config = configuration(%{server: "wrong.smtp.domain"})
 
     assert_raise SMTPAdapter.SMTPError, ~r/network_failure/, fn ->
@@ -175,7 +175,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
   test "emails raise an exception when email can't be sent" do
     bamboo_email = new_email(from: {"Wrong User", "wrong@user.com"})
-    bamboo_config = configuration
+    bamboo_config = configuration()
 
     assert_raise SMTPAdapter.SMTPError, ~r/554 Message rejected/, fn ->
       SMTPAdapter.deliver(bamboo_email, bamboo_config)
@@ -184,7 +184,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
   test "emails looks fine when only text body is set" do
     bamboo_email = new_email(text_body: nil)
-    bamboo_config = configuration
+    bamboo_config = configuration()
 
     :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
@@ -223,7 +223,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
   test "emails looks fine when only HTML body is set" do
     bamboo_email = new_email(html_body: nil)
-    bamboo_config = configuration
+    bamboo_config = configuration()
 
     :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
@@ -261,8 +261,8 @@ defmodule Bamboo.SMTPAdapterTest do
   end
 
   test "emails looks fine when text and HTML bodys are sets" do
-    bamboo_email = new_email
-    bamboo_config = configuration
+    bamboo_email = new_email()
+    bamboo_config = configuration()
 
     :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
@@ -305,7 +305,7 @@ defmodule Bamboo.SMTPAdapterTest do
     |> Email.new_email
     |> Bamboo.Mailer.normalize_addresses
 
-    bamboo_config = configuration
+    bamboo_config = configuration()
 
     :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
