@@ -25,13 +25,13 @@ defmodule BambooSmtp.Mixfile do
 
   defp deps do
     [
-      {:bamboo, "~> 0.7.0"},
-      {:dogma, "~> 0.1", only: [:dev, :test]},
-      {:earmark, ">= 1.0.1", only: :dev},
-      {:ex_doc, "~> 0.13.0", only: :dev},
-      {:excoveralls, "~> 0.4", only: :test},
+      {:bamboo, "~> 0.8.0"},
+      {:dogma, "~> 0.1.13", only: [:dev, :test]},
+      {:earmark, ">= 1.0.3", only: :dev},
+      {:ex_doc, "~> 0.14.5", only: :dev},
+      {:excoveralls, "~> 0.6.0", only: :test},
       {:gen_smtp, "~> 0.11.0"},
-      {:inch_ex, "~> 0.5.3", only: :docs}
+      {:inch_ex, "~> 0.5.5", only: :docs}
     ]
   end
 
