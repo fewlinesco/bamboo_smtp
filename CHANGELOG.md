@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 1.3.0 - 2017-01-12
+
+* Add test targets for Elixir & OTP ([#45])
+* Don't need to enforce username/password ([#37])
+* Updated dependencies ([#43])
+* Fix for emails going to spam with office365 smtp ([#39])
+* Fixed parentheses deprecations for elixir 1.4 ([#41])
+* Add some doc badge love with inchCI ([#34])
+
+[#45]: https://github.com/fewlinesco/bamboo_smtp/pull/45
+[#37]: https://github.com/fewlinesco/bamboo_smtp/pull/37
+[#43]: https://github.com/fewlinesco/bamboo_smtp/pull/43
+[#39]: https://github.com/fewlinesco/bamboo_smtp/pull/39
+[#41]: https://github.com/fewlinesco/bamboo_smtp/pull/41
+[#34]: https://github.com/fewlinesco/bamboo_smtp/pull/34
+
 ## 1.2.1 - 2016-08-23
 
 * Fix From/To headers passed to gen_smtp not to be formated that caused an error with some SMTP cloud providers like Amazon SES ([#31])
