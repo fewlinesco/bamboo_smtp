@@ -1,18 +1,24 @@
 sudo: required
 language: elixir
 elixir:
-  - 1.2.6
-  - 1.3.2
+  - 1.3.4
+  - 1.4.0
 otp_release:
-  - 18.3
-  - 19.0
+  - 19.2
+matrix:
+  include:
+    - elixir: 1.2.6
+      otp_release: 18.3
 cache:
   directories:
     - _build
     - deps
 script:
   - mix test
-  - mix dogma
+  - mix credo --strict
+after_script:
+  - mix deps.get --only docs
+  - MIX_ENV=docs mix inch.report
 notifications:
   slack:
     secure: IOIWS7VDdEx/JyxyZ6DJ5b7qYLTYPdaiVkhN/1VL3jjXAl+IHBd5gHfi2VgozGCQ9TvLAYvxsAVbywHXQQk4fk4Tm69Y5fiN+BGQkL22Mseo1kwwEllRzLNPCRiNNiRzDOMT8If9VeaYTTyh2hecRBsTkMeH9Htewf8EI2uIF07xRZtYqGcgnbg8+kTMhAvnhx1jHxDJQ0qYaHn5FWwy8SKocAzgYbU13xvGeCkomwkoUCxHj3B/+NWavBw1XObx1f75ZO8WeFub5wVbqgoAhJ/sygGiTTdFzg2OTCx4hmrBbxI1q6o4uLa9tmIuxAWpOfxVotd8/90ansDAk2epJBY31sPBYqQZgCdxI1JNAWpLQYPRrrQkQ1Vo1ofznHaiJtNC9sherjio/360ZdpNScUmPZAAzcjmsAv3vIqmYIBCPL0w53hGgG/1cGS/AvtDXrP5k66jGDG9Absy6d4DmeHgn95RatFs2SAKuObPbIbVfHbA2l/Debz+qSqu5GD0I47tbMTer9/BB9pvwLQ4b7q58S3RthDEVl5Y44grN1dj3Y/B3vnRqMsm2ftonlPMGDTjBLW80xBBF/qi6HtZmRpGsVrE+pUVCZ4KwFUW/e/lhDyrrXmwmSlESOj9nyXdoqmMQlOE+3IDfZa9n/k0aMoeeWtTG3kPDNVQvTbDZIQ=

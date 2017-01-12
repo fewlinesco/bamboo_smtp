@@ -5,8 +5,8 @@ defmodule BambooSmtp.Mixfile do
 
   def project do
     [app: :bamboo_smtp,
-     version: "1.2.1",
-     elixir: "~> 1.2",
+     version: "1.3.0",
+     elixir: ">= 1.2.3",
      source_url: @project_url,
      homepage_url: @project_url,
      name: "Bamboo SMTP Adapter",
@@ -14,8 +14,8 @@ defmodule BambooSmtp.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
-     package: package,
-     deps: deps,
+     package: package(),
+     deps: deps(),
      docs: [main: "README", extras: ["README.md"]]]
   end
 
@@ -25,12 +25,13 @@ defmodule BambooSmtp.Mixfile do
 
   defp deps do
     [
-      {:bamboo, "~> 0.7.0"},
+      {:bamboo, "~> 0.8.0"},
+      {:credo, "~> 0.5.3", only: [:dev, :test]},
+      {:earmark, ">= 1.0.3", only: :dev},
+      {:ex_doc, "~> 0.14.5", only: :dev},
+      {:excoveralls, "~> 0.6.0", only: :test},
       {:gen_smtp, "~> 0.11.0"},
-      {:ex_doc, "~> 0.13.0", only: :dev},
-      {:earmark, ">= 1.0.1", only: :dev},
-      {:dogma, "~> 0.1", only: [:dev, :test]},
-      {:excoveralls, "~> 0.4", only: :test},
+      {:inch_ex, "~> 0.5.5", only: :docs}
     ]
   end
 
