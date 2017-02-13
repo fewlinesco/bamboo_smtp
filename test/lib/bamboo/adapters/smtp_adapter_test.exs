@@ -149,6 +149,53 @@ defmodule Bamboo.SMTPAdapterTest do
     assert retries == 42
   end
 
+  test "sets server and port from System when specified" do
+    System.put_env("SERVER", "server")
+    System.put_env("PORT", "123")
+    config = %{
+      server: {:system, "SERVER"},
+      port: {:system, "PORT"}
+    }
+
+    bamboo_email = new_email()
+    bamboo_config = SMTPAdapter.handle_config(configuration(config))
+    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:relay] == "server"
+    assert gen_smtp_config[:port] == 123
+  end
+
+  test "sets tls if_available from System when specified" do
+    System.put_env("TLS", "if_available")
+
+    config = SMTPAdapter.handle_config(configuration(%{tls: {:system, "TLS"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:tls] == :if_available
+  end
+
+  test "sets tls always from System when specified" do
+    System.put_env("TLS", "always")
+
+    config = SMTPAdapter.handle_config(configuration(%{tls: {:system, "TLS"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:tls] == :always
+  end
+
+  test "sets tls never from System when specified" do
+    System.put_env("TLS", "never")
+
+    config = SMTPAdapter.handle_config(configuration(%{tls: {:system, "TLS"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:tls] == :never
+  end
+
   test "sets username and password from System when specified" do
     System.put_env("SMTP_USER", "joeblow")
     System.put_env("SMTP_PASS", "fromkokomo")
@@ -162,6 +209,36 @@ defmodule Bamboo.SMTPAdapterTest do
 
     assert  gen_smtp_config[:username] == "joeblow"
     assert gen_smtp_config[:password] == "fromkokomo"
+  end
+
+  test "sets ssl true from System when specified" do
+    System.put_env("SSL", "true")
+
+    config = SMTPAdapter.handle_config(configuration(%{ssl: {:system, "SSL"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:ssl]
+  end
+
+  test "sets ssl false from System when specified" do
+    System.put_env("SSL", "false")
+    config = SMTPAdapter.handle_config(configuration(%{ssl: {:system, "SSL"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    refute gen_smtp_config[:ssl]
+  end
+
+  test "sets retries from System when specified" do
+    bamboo_email = new_email()
+    System.put_env("RETRIES", "123")
+
+    config = SMTPAdapter.handle_config(configuration(%{retries: {:system, "RETRIES"}}))
+    :ok = SMTPAdapter.deliver(bamboo_email, config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert 123 == gen_smtp_config[:retries]
   end
 
   test "emails raise an exception when configuration is wrong" do
