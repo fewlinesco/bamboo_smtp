@@ -286,34 +286,52 @@ defmodule Bamboo.SMTPAdapter do
     Enum.reduce(config, [], &to_gen_smtp_server_config/2)
   end
 
-  defp to_gen_smtp_server_config({:server, value}, config) do
+  defp to_gen_smtp_server_config({:server, value}, config) when is_binary(value) do
     [{:relay, value} | config]
   end
-  defp to_gen_smtp_server_config({:username, {:system, var}}, config) do
-    [{:username, System.get_env(var)} | config]
-  end
-  defp to_gen_smtp_server_config({:username, value}, config) do
+  defp to_gen_smtp_server_config({:username, value}, config) when is_binary(value) do
     [{:username, value} | config]
   end
-  defp to_gen_smtp_server_config({:password, {:system, var}}, config) do
-    [{:password, System.get_env(var)} | config]
-  end
-  defp to_gen_smtp_server_config({:password, value}, config) do
+  defp to_gen_smtp_server_config({:password, value}, config) when is_binary(value) do
     [{:password, value} | config]
   end
-  defp to_gen_smtp_server_config({:tls, value}, config) do
+  defp to_gen_smtp_server_config({:tls, "if_available"}, config) do
+    [{:tls, :if_available} | config]
+  end
+  defp to_gen_smtp_server_config({:tls, "always"}, config) do
+    [{:tls, :always} | config]
+  end
+  defp to_gen_smtp_server_config({:tls, "never"}, config) do
+    [{:tls, :never} | config]
+  end
+  defp to_gen_smtp_server_config({:tls, value}, config) when is_atom(value) do
     [{:tls, value} | config]
   end
-  defp to_gen_smtp_server_config({:port, value}, config) do
+  defp to_gen_smtp_server_config({:port, value}, config) when is_binary(value) do
+    [{:port, String.to_integer(value)} | config]
+  end
+  defp to_gen_smtp_server_config({:port, value}, config) when is_integer(value) do
     [{:port, value} | config]
   end
-  defp to_gen_smtp_server_config({:ssl, value}, config) do
+  defp to_gen_smtp_server_config({:ssl, "true"}, config) do
+    [{:ssl, true} | config]
+  end
+  defp to_gen_smtp_server_config({:ssl, "false"}, config) do
+    [{:ssl, false} | config]
+  end
+  defp to_gen_smtp_server_config({:ssl, value}, config) when is_boolean(value) do
     [{:ssl, value} | config]
   end
-  defp to_gen_smtp_server_config({:retries, value}, config) do
+  defp to_gen_smtp_server_config({:retries, value}, config) when is_binary(value) do
+    [{:retries, String.to_integer(value)} | config]
+  end
+  defp to_gen_smtp_server_config({:retries, value}, config) when is_integer(value) do
     [{:retries, value} | config]
   end
- defp to_gen_smtp_server_config({_key, _value}, config) do
+  defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
+    to_gen_smtp_server_config({conf, System.get_env(var)}, config)
+  end
+  defp to_gen_smtp_server_config({_key, _value}, config) do
     config
   end
 end
