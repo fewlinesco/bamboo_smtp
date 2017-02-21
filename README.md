@@ -42,6 +42,10 @@ The package can be installed as:
 
 4. Follow Bamboo [Getting Started Guide](https://github.com/thoughtbot/bamboo#getting-started)
 
+## Usage
+
+You can find more information about advanced features in the [Wiki](https://github.com/fewlinesco/bamboo_smtp/wiki).
+
 ## Contributing
 
 Before opening a pull request you can open an issue if you have any question or need some guidance.

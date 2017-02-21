@@ -34,9 +34,9 @@ defmodule Bamboo.SMTPAdapter do
   defmodule SMTPError do
     @moduledoc false
 
-    defexception [:message]
+    defexception [:message, :raw]
 
-    def exception({reason, detail}) do
+    def exception(raw = {reason, detail}) do
       message = """
       There was a problem sending the email through SMTP.
 
@@ -47,7 +47,7 @@ defmodule Bamboo.SMTPAdapter do
       #{inspect detail}
       """
 
-      %SMTPError{message: message}
+      %SMTPError{message: message, raw: raw}
     end
   end
 

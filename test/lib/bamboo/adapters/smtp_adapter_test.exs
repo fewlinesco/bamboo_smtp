@@ -248,6 +248,13 @@ defmodule Bamboo.SMTPAdapterTest do
     assert_raise SMTPAdapter.SMTPError, ~r/network_failure/, fn ->
       SMTPAdapter.deliver(bamboo_email, bamboo_config)
     end
+
+    try do
+      SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    rescue
+      error ->
+        assert {:retries_exceeded, _detail} = error.raw
+    end
   end
 
   test "emails raise an exception when email can't be sent" do
@@ -256,6 +263,13 @@ defmodule Bamboo.SMTPAdapterTest do
 
     assert_raise SMTPAdapter.SMTPError, ~r/554 Message rejected/, fn ->
       SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    end
+
+    try do
+      SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    rescue
+      error ->
+        assert {:no_more_hosts, _detail} = error.raw
     end
   end
 
