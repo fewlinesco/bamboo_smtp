@@ -4,6 +4,9 @@ defmodule Bamboo.SMTPAdapter do
 
   Use this adapter to send emails through SMTP. This adapter requires
   that some settings are set in the config. See the example section below.
+  
+  *Sensitive credentials should not be committed to source control and are best kept in environment variables.
+  Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*
 
   ## Example config
 
