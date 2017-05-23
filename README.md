@@ -40,6 +40,9 @@ The package can be installed as:
     retries: 1
   ```
 
+*Sensitive credentials should not be committed to source control and are best kept in environment variables.
+Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*
+
 4. Follow Bamboo [Getting Started Guide](https://github.com/thoughtbot/bamboo#getting-started)
 
 ## Usage
