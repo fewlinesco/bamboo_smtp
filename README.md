@@ -33,12 +33,15 @@ The package can be installed as:
     adapter: Bamboo.SMTPAdapter,
     server: "smtp.domain",
     port: 1025,
-    username: "your.name@your.domain",
-    password: "pa55word",
+    username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
+    password: "pa55word", # or {:system, "SMTP_PASSWORD"}
     tls: :if_available, # can be `:always` or `:never`
     ssl: false, # can be `true`
     retries: 1
   ```
+
+*Sensitive credentials should not be committed to source control and are best kept in environment variables.
+Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*
 
 4. Follow Bamboo [Getting Started Guide](https://github.com/thoughtbot/bamboo#getting-started)
 
