@@ -241,6 +241,15 @@ defmodule Bamboo.SMTPAdapterTest do
     assert 123 == gen_smtp_config[:retries]
   end
 
+  test "sets tls versions from System when specified" do
+    System.put_env("ALLOWED_TLS_VERSIONS", "tlsv1,tlsv1.2")
+    config = SMTPAdapter.handle_config(configuration(%{allowed_tls_versions: {:system, "ALLOWED_TLS_VERSIONS"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert [:"tlsv1", :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
+  end
+
   test "emails raise an exception when configuration is wrong" do
     bamboo_email = new_email()
     bamboo_config = configuration(%{server: "wrong.smtp.domain"})
