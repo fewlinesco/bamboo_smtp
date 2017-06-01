@@ -18,6 +18,8 @@ defmodule Bamboo.SMTPAdapter do
         username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
         password: "pa55word", # or {:system, "SMTP_PASSWORD"}
         tls: :if_available, # can be `:always` or `:never`
+        allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
+        # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
         ssl: :false, # can be `:true`
         retries: 1
 
@@ -33,6 +35,7 @@ defmodule Bamboo.SMTPAdapter do
 
   @required_configuration [:server, :port]
   @default_configuration %{tls: :if_available, ssl: :false, retries: 1, transport: :gen_smtp_client}
+  @tls_versions ~w(tlsv1 tlsv1.1 tlsv1.2)
 
   defmodule SMTPError do
     @moduledoc false
@@ -310,6 +313,12 @@ defmodule Bamboo.SMTPAdapter do
   defp to_gen_smtp_server_config({:tls, value}, config) when is_atom(value) do
     [{:tls, value} | config]
   end
+  defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_binary(value) do
+    [{:tls_options, [{:versions, string_to_tls_versions(value)}]} | config]
+  end
+  defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_list(value) do
+    [{:tls_options, [{:versions, value}]} | config]
+  end
   defp to_gen_smtp_server_config({:port, value}, config) when is_binary(value) do
     [{:port, String.to_integer(value)} | config]
   end
@@ -336,5 +345,12 @@ defmodule Bamboo.SMTPAdapter do
   end
   defp to_gen_smtp_server_config({_key, _value}, config) do
     config
+  end
+
+  defp string_to_tls_versions(version_string) do
+    version_string
+    |> String.split(",")
+    |> Enum.filter(&(&1 in @tls_versions))
+    |> Enum.map(&String.to_atom/1)
   end
 end

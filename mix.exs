@@ -30,7 +30,7 @@ defmodule BambooSmtp.Mixfile do
       {:earmark, ">= 1.0.3", only: :dev},
       {:ex_doc, "~> 0.14.5", only: :dev},
       {:excoveralls, "~> 0.6.0", only: :test},
-      {:gen_smtp, "~> 0.11.0"},
+      {:gen_smtp, "~> 0.12.0"},
       {:inch_ex, "~> 0.5.5", only: :docs}
     ]
   end
