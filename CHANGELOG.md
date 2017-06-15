@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.4.0 - 2017-06-15
+
+* Add system env to all configs ([#49])
+* Add the raw error tuple when we raise an error ([#51])
+* Fix email delivery issue when subject is empty ([#60])
+
+[#49]: https://github.com/fewlinesco/bamboo_smtp/pull/49
+[#51]: https://github.com/fewlinesco/bamboo_smtp/pull/51
+[#60]: https://github.com/fewlinesco/bamboo_smtp/pull/60
+
 ## 1.3.0 - 2017-01-12
 
 * Add test targets for Elixir & OTP ([#45])

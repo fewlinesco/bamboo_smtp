@@ -5,6 +5,9 @@ defmodule Bamboo.SMTPAdapter do
   Use this adapter to send emails through SMTP. This adapter requires
   that some settings are set in the config. See the example section below.
 
+  *Sensitive credentials should not be committed to source control and are best kept in environment variables.
+  Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*
+
   ## Example config
 
       # In config/config.exs, or config.prod.exs, etc.
@@ -12,9 +15,11 @@ defmodule Bamboo.SMTPAdapter do
         adapter: Bamboo.SMTPAdapter,
         server: "smtp.domain",
         port: 1025,
-        username: "your.name@your.domain", # or {:system, "SMTP_USER"}
-        password: "pa55word", # or {:system, "SMTP_PASS"}
+        username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
+        password: "pa55word", # or {:system, "SMTP_PASSWORD"}
         tls: :if_available, # can be `:always` or `:never`
+        allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
+        # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
         ssl: :false, # can be `:true`
         retries: 1
 
@@ -30,13 +35,14 @@ defmodule Bamboo.SMTPAdapter do
 
   @required_configuration [:server, :port]
   @default_configuration %{tls: :if_available, ssl: :false, retries: 1, transport: :gen_smtp_client}
+  @tls_versions ~w(tlsv1 tlsv1.1 tlsv1.2)
 
   defmodule SMTPError do
     @moduledoc false
 
-    defexception [:message]
+    defexception [:message, :raw]
 
-    def exception({reason, detail}) do
+    def exception(raw = {reason, detail}) do
       message = """
       There was a problem sending the email through SMTP.
 
@@ -47,7 +53,7 @@ defmodule Bamboo.SMTPAdapter do
       #{inspect detail}
       """
 
-      %SMTPError{message: message}
+      %SMTPError{message: message, raw: raw}
     end
   end
 
@@ -141,6 +147,9 @@ defmodule Bamboo.SMTPAdapter do
 
   defp add_smtp_line(body, content), do: body <> content <> "\r\n"
 
+  defp add_subject(body, %Bamboo.Email{subject: subject}) when is_nil(subject) do
+    add_smtp_header_line(body, :subject, "")
+  end
   defp add_subject(body, %Bamboo.Email{subject: subject}) do
     add_smtp_header_line(body, :subject, rfc822_encode(subject))
   end
@@ -286,34 +295,65 @@ defmodule Bamboo.SMTPAdapter do
     Enum.reduce(config, [], &to_gen_smtp_server_config/2)
   end
 
-  defp to_gen_smtp_server_config({:server, value}, config) do
+  defp to_gen_smtp_server_config({:server, value}, config) when is_binary(value) do
     [{:relay, value} | config]
   end
-  defp to_gen_smtp_server_config({:username, {:system, var}}, config) do
-    [{:username, System.get_env(var)} | config]
-  end
-  defp to_gen_smtp_server_config({:username, value}, config) do
+  defp to_gen_smtp_server_config({:username, value}, config) when is_binary(value) do
     [{:username, value} | config]
   end
-  defp to_gen_smtp_server_config({:password, {:system, var}}, config) do
-    [{:password, System.get_env(var)} | config]
-  end
-  defp to_gen_smtp_server_config({:password, value}, config) do
+  defp to_gen_smtp_server_config({:password, value}, config) when is_binary(value) do
     [{:password, value} | config]
   end
-  defp to_gen_smtp_server_config({:tls, value}, config) do
+  defp to_gen_smtp_server_config({:tls, "if_available"}, config) do
+    [{:tls, :if_available} | config]
+  end
+  defp to_gen_smtp_server_config({:tls, "always"}, config) do
+    [{:tls, :always} | config]
+  end
+  defp to_gen_smtp_server_config({:tls, "never"}, config) do
+    [{:tls, :never} | config]
+  end
+  defp to_gen_smtp_server_config({:tls, value}, config) when is_atom(value) do
     [{:tls, value} | config]
   end
-  defp to_gen_smtp_server_config({:port, value}, config) do
+  defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_binary(value) do
+    [{:tls_options, [{:versions, string_to_tls_versions(value)}]} | config]
+  end
+  defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_list(value) do
+    [{:tls_options, [{:versions, value}]} | config]
+  end
+  defp to_gen_smtp_server_config({:port, value}, config) when is_binary(value) do
+    [{:port, String.to_integer(value)} | config]
+  end
+  defp to_gen_smtp_server_config({:port, value}, config) when is_integer(value) do
     [{:port, value} | config]
   end
-  defp to_gen_smtp_server_config({:ssl, value}, config) do
+  defp to_gen_smtp_server_config({:ssl, "true"}, config) do
+    [{:ssl, true} | config]
+  end
+  defp to_gen_smtp_server_config({:ssl, "false"}, config) do
+    [{:ssl, false} | config]
+  end
+  defp to_gen_smtp_server_config({:ssl, value}, config) when is_boolean(value) do
     [{:ssl, value} | config]
   end
-  defp to_gen_smtp_server_config({:retries, value}, config) do
+  defp to_gen_smtp_server_config({:retries, value}, config) when is_binary(value) do
+    [{:retries, String.to_integer(value)} | config]
+  end
+  defp to_gen_smtp_server_config({:retries, value}, config) when is_integer(value) do
     [{:retries, value} | config]
   end
- defp to_gen_smtp_server_config({_key, _value}, config) do
+  defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
+    to_gen_smtp_server_config({conf, System.get_env(var)}, config)
+  end
+  defp to_gen_smtp_server_config({_key, _value}, config) do
     config
+  end
+
+  defp string_to_tls_versions(version_string) do
+    version_string
+    |> String.split(",")
+    |> Enum.filter(&(&1 in @tls_versions))
+    |> Enum.map(&String.to_atom/1)
   end
 end

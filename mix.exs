@@ -5,7 +5,7 @@ defmodule BambooSmtp.Mixfile do
 
   def project do
     [app: :bamboo_smtp,
-     version: "1.3.0",
+     version: "1.4.0",
      elixir: ">= 1.2.3",
      source_url: @project_url,
      homepage_url: @project_url,
@@ -30,7 +30,7 @@ defmodule BambooSmtp.Mixfile do
       {:earmark, ">= 1.0.3", only: :dev},
       {:ex_doc, "~> 0.14.5", only: :dev},
       {:excoveralls, "~> 0.6.0", only: :test},
-      {:gen_smtp, "~> 0.11.0"},
+      {:gen_smtp, "~> 0.12.0"},
       {:inch_ex, "~> 0.5.5", only: :docs}
     ]
   end
