@@ -321,6 +321,22 @@ defmodule Bamboo.SMTPAdapterTest do
     assert_configuration bamboo_config, gen_smtp_config
   end
 
+  test "email is sent when subject is not set" do
+    bamboo_email = new_email(subject: nil)
+    bamboo_config = configuration()
+
+    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    assert 1 = length(FakeGenSMTP.fetch_sent_emails)
+
+    [{{_from, _to, raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    rfc822_subject = "Subject: \r\n"
+    assert String.contains?(raw_email, rfc822_subject)
+
+    assert_configuration bamboo_config, gen_smtp_config
+  end
+
   test "emails looks fine when only HTML body is set" do
     bamboo_email = new_email(html_body: nil)
     bamboo_config = configuration()

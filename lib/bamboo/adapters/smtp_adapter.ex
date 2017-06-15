@@ -147,6 +147,9 @@ defmodule Bamboo.SMTPAdapter do
 
   defp add_smtp_line(body, content), do: body <> content <> "\r\n"
 
+  defp add_subject(body, %Bamboo.Email{subject: subject}) when is_nil(subject) do
+    add_smtp_header_line(body, :subject, "")
+  end
   defp add_subject(body, %Bamboo.Email{subject: subject}) do
     add_smtp_header_line(body, :subject, rfc822_encode(subject))
   end
