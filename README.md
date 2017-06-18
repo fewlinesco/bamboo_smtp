@@ -50,6 +50,10 @@ Using `{:system, "ENV_NAME"}` configuration is read from the named environment v
 
 You can find more information about advanced features in the [Wiki](https://github.com/fewlinesco/bamboo_smtp/wiki).
 
+## Code of Conduct
+
+By participating in this project, you agree to abide by its [CODE OF CONDUCT](CODE_OF_CONDUCT.md)
+
 ## Contributing
 
 Before opening a pull request you can open an issue if you have any question or need some guidance.
