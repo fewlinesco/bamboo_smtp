@@ -56,18 +56,7 @@ By participating in this project, you agree to abide by its [CODE OF CONDUCT](CO
 
 ## Contributing
 
-Before opening a pull request you can open an issue if you have any question or need some guidance.
-
-Here's how to setup the project:
-
-```
-$ git clone https://github.com/fewlinesco/bamboo_smtp.git
-$ cd bamboo_smtp
-$ mix deps.get
-$ mix test
-```
-
-Once you've made your additions and `mix test` passes, go ahead and open a Pull Request.
+You can see the specific [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 ## License
 
