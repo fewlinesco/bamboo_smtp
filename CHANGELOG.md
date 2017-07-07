@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.5.0-rc.1 - 2017-07-07
+
+* Upgrading bamboo to 1.0.0-rc ([#67])
+* Add Hex.pm badge with package version ([#66])
+* Add a CONTRIBUTING guide ([#65])
+* Create CODE_OF_CONDUCT.md ([#64])
+
+[#67]: https://github.com/fewlinesco/bamboo_smtp/pull/67
+[#66]: https://github.com/fewlinesco/bamboo_smtp/pull/66
+[#65]: https://github.com/fewlinesco/bamboo_smtp/pull/65
+[#64]: https://github.com/fewlinesco/bamboo_smtp/pull/64
+
 ## 1.4.0 - 2017-06-15
 
 * Add system env to all configs ([#49])
