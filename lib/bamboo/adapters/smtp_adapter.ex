@@ -192,7 +192,7 @@ defmodule Bamboo.SMTPAdapter do
     "----=_Part_#{random1}_#{random2}.#{random3}"
   end
 
-  defp body(%Bamboo.Email{} = email) do
+  defp body(email = %Bamboo.Email{}) do
     multi_part_delimiter = generate_multi_part_delimiter()
 
     ""
@@ -281,13 +281,13 @@ defmodule Bamboo.SMTPAdapter do
     """
   end
 
-  defp to_without_format(%Bamboo.Email{} = email) do
+  defp to_without_format(email = %Bamboo.Email{}) do
     email
     |> Bamboo.Email.all_recipients
     |> format_email(:to, false)
   end
 
-  defp to_gen_smtp_message(%Bamboo.Email{} = email) do
+  defp to_gen_smtp_message(email = %Bamboo.Email{}) do
     {from_without_format(email), to_without_format(email), body(email)}
   end
 
