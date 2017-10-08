@@ -33,6 +33,7 @@ The package can be installed as:
   config :my_app, MyApp.Mailer,
     adapter: Bamboo.SMTPAdapter,
     server: "smtp.domain",
+    hostname: "your.domain",
     port: 1025,
     username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
     password: "pa55word", # or {:system, "SMTP_PASSWORD"}
@@ -44,6 +45,8 @@ The package can be installed as:
 
 *Sensitive credentials should not be committed to source control and are best kept in environment variables.
 Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*
+
+The *hostname* option sets the FQDN to the header of your emails, its optional, but if you don't set it, the underlying `gen_smtp` module will use the hostname of your machine, like `localhost`.
 
 4. Follow Bamboo [Getting Started Guide](https://github.com/thoughtbot/bamboo#getting-started)
 

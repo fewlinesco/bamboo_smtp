@@ -14,6 +14,7 @@ defmodule Bamboo.SMTPAdapter do
       config :my_app, MyApp.Mailer,
         adapter: Bamboo.SMTPAdapter,
         server: "smtp.domain",
+        hostname: "www.mydomain.com",
         port: 1025,
         username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
         password: "pa55word", # or {:system, "SMTP_PASSWORD"}
@@ -342,6 +343,9 @@ defmodule Bamboo.SMTPAdapter do
   end
   defp to_gen_smtp_server_config({:retries, value}, config) when is_integer(value) do
     [{:retries, value} | config]
+  end
+  defp to_gen_smtp_server_config({:hostname, value}, config) when is_binary(value) do
+    [{:hostname, value} | config]
   end
   defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
     to_gen_smtp_server_config({conf, System.get_env(var)}, config)
