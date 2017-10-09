@@ -62,6 +62,7 @@ defmodule Bamboo.SMTPAdapterTest do
     adapter: SMTPAdapter,
     server: "smtp.domain",
     port: 1025,
+    hostname: "your.domain",
     username: "your.name@your.domain",
     password: "pa55word",
     transport: FakeGenSMTP
@@ -449,6 +450,7 @@ defmodule Bamboo.SMTPAdapterTest do
   defp assert_configuration(bamboo_config, gen_smtp_config) do
     assert bamboo_config[:server] == gen_smtp_config[:relay]
     assert bamboo_config[:port] == gen_smtp_config[:port]
+    assert bamboo_config[:hostname] == gen_smtp_config[:hostname]
     assert bamboo_config[:username] == gen_smtp_config[:username]
     assert bamboo_config[:password] == gen_smtp_config[:password]
     assert bamboo_config[:tls] == gen_smtp_config[:tls]
