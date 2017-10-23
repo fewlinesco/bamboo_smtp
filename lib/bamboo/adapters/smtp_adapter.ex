@@ -223,7 +223,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp format_email({nil, email}, _format), do: email
-  defp format_email({name, email}, true), do: "#{name} <#{email}>"
+  defp format_email({name, email}, true), do: "#{rfc822_encode(name)} <#{email}>"
   defp format_email({_name, email}, false), do: email
   defp format_email(emails, format) when is_list(emails) do
     Enum.map(emails, &format_email(&1, format))
