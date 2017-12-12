@@ -434,7 +434,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
   defp format_email(emails), do: format_email(emails, true)
 
-  defp format_email({name, email}, true), do: "#{name} <#{email}>"
+  defp format_email({name, email}, true), do: "#{rfc822_encode(name)} <#{email}>"
   defp format_email({_name, email}, false), do: email
   defp format_email(emails, format) when is_list(emails) do
     emails |> Enum.map(&format_email_as_string(&1, format))
@@ -445,6 +445,10 @@ defmodule Bamboo.SMTPAdapterTest do
   end
   defp format_email_as_string(email, format \\ true) do
     format_email(email, format)
+  end
+
+  defp rfc822_encode(content) do
+    "=?UTF-8?B?#{Base.encode64(content)}?="
   end
 
   defp assert_configuration(bamboo_config, gen_smtp_config) do
