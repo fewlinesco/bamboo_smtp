@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.5.0-rc.2 - 2018-01-05
+
+* Add attachment support ([#35])
+* Apply rfc822_encode to headers(FROM, BCC, CC, TO) ([#75])
+* Make the hostname (FQDN) configurable ([#74])
+* Update Elixir, OTP and all deps to latest versions available ([#69])
+
+[#35]: https://github.com/fewlinesco/bamboo_smtp/pull/35
+[#75]: https://github.com/fewlinesco/bamboo_smtp/pull/75
+[#74]: https://github.com/fewlinesco/bamboo_smtp/pull/74
+[#69]: https://github.com/fewlinesco/bamboo_smtp/pull/69
+
 ## 1.5.0-rc.1 - 2017-07-07
 
 * Upgrading bamboo to 1.0.0-rc ([#67])
