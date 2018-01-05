@@ -77,6 +77,9 @@ defmodule Bamboo.SMTPAdapter do
     |> put_default_configuration
   end
 
+  @doc false
+  def supports_attachments?, do: true
+
   defp handle_response({:error, reason, detail}) do
     raise SMTPError, {reason, detail}
   end
@@ -136,6 +139,10 @@ defmodule Bamboo.SMTPAdapter do
     add_smtp_header_line(body, "Content-Type", ~s(multipart/alternative; boundary="#{delimiter}"))
   end
 
+  defp add_multipart_mixed_header(body, delimiter) do
+    add_smtp_header_line(body, "Content-Type", ~s(multipart/mixed; boundary="#{delimiter}"))
+  end
+
   defp add_smtp_header_line(body, type, content) when is_list(content) do
     Enum.reduce(content, body, &add_smtp_header_line(&2, type, &1))
   end
@@ -171,6 +178,41 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line(text_body)
   end
 
+  defp add_attachment_header(body, attachment) do
+    << random :: size(32) >> = :crypto.strong_rand_bytes(4)
+    body
+    |> add_smtp_line("Content-Type: #{attachment.content_type}; name=\"#{attachment.filename}\"")
+    |> add_smtp_line("Content-Disposition: attachment; filename=\"#{attachment.filename}\"")
+    |> add_smtp_line("Content-Transfer-Encoding: base64")
+    |> add_smtp_line("X-Attachment-Id: #{random}")
+  end
+
+  defp add_attachment_body(body, data) do
+    data =
+      data
+      |> Base.encode64()
+      |> Stream.unfold(&String.split_at(&1, 76))
+      |> Enum.take_while(&(&1 != ""))
+      |> Enum.join("\r\n")
+    add_smtp_line(body, data)
+  end
+
+  defp add_attachment(nil, _), do: ""
+  defp add_attachment(attachment, multi_part_mixed_delimiter) do
+    ""
+    |> add_multipart_delimiter(multi_part_mixed_delimiter)
+    |> add_attachment_header(attachment)
+    |> add_smtp_line("")
+    |> add_attachment_body(attachment.data)
+  end
+
+  defp add_attachments(body, %Bamboo.Email{attachments: nil}, _), do: body
+  defp add_attachments(body, %Bamboo.Email{attachments: attachments}, multi_part_mixed_delimiter) do
+    attachment_part =
+      attachments |> Enum.map(fn(attachment) -> add_attachment(attachment, multi_part_mixed_delimiter) end)
+    "#{body}#{attachment_part}"
+  end
+
   defp add_to(body, %Bamboo.Email{to: recipients}) do
     add_smtp_header_line(body, :to, format_email_as_string(recipients, :to))
   end
@@ -195,7 +237,7 @@ defmodule Bamboo.SMTPAdapter do
 
   defp body(email = %Bamboo.Email{}) do
     multi_part_delimiter = generate_multi_part_delimiter()
-
+    multi_part_mixed_delimiter = generate_multi_part_delimiter()
     ""
     |> add_subject(email)
     |> add_from(email)
@@ -204,11 +246,16 @@ defmodule Bamboo.SMTPAdapter do
     |> add_to(email)
     |> add_custom_headers(email)
     |> add_mime_header
+    |> add_multipart_mixed_header(multi_part_mixed_delimiter)
+    |> add_ending_header
+    |> add_multipart_delimiter(multi_part_mixed_delimiter)
     |> add_multipart_header(multi_part_delimiter)
     |> add_ending_header
     |> add_text_body(email, multi_part_delimiter)
     |> add_html_body(email, multi_part_delimiter)
     |> add_ending_multipart(multi_part_delimiter)
+    |> add_attachments(email, multi_part_mixed_delimiter)
+    |> add_ending_multipart(multi_part_mixed_delimiter)
   end
 
   defp build_error({:ok, value}, _key, errors) when value != nil, do: errors
