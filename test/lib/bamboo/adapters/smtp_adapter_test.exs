@@ -62,6 +62,7 @@ defmodule Bamboo.SMTPAdapterTest do
     adapter: SMTPAdapter,
     server: "smtp.domain",
     port: 1025,
+    hostname: "your.domain",
     username: "your.name@your.domain",
     password: "pa55word",
     transport: FakeGenSMTP
@@ -433,7 +434,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
   defp format_email(emails), do: format_email(emails, true)
 
-  defp format_email({name, email}, true), do: "#{name} <#{email}>"
+  defp format_email({name, email}, true), do: "#{rfc822_encode(name)} <#{email}>"
   defp format_email({_name, email}, false), do: email
   defp format_email(emails, format) when is_list(emails) do
     emails |> Enum.map(&format_email_as_string(&1, format))
@@ -446,9 +447,14 @@ defmodule Bamboo.SMTPAdapterTest do
     format_email(email, format)
   end
 
+  defp rfc822_encode(content) do
+    "=?UTF-8?B?#{Base.encode64(content)}?="
+  end
+
   defp assert_configuration(bamboo_config, gen_smtp_config) do
     assert bamboo_config[:server] == gen_smtp_config[:relay]
     assert bamboo_config[:port] == gen_smtp_config[:port]
+    assert bamboo_config[:hostname] == gen_smtp_config[:hostname]
     assert bamboo_config[:username] == gen_smtp_config[:username]
     assert bamboo_config[:password] == gen_smtp_config[:password]
     assert bamboo_config[:tls] == gen_smtp_config[:tls]

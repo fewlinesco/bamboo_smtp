@@ -1,3 +1,4 @@
+[![Hex pm](https://img.shields.io/hexpm/v/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
 [![Build Status](https://travis-ci.org/fewlinesco/bamboo_smtp.svg?branch=master)](https://travis-ci.org/fewlinesco/bamboo_smtp)
 [![Inline docs](http://inch-ci.org/github/fewlinesco/bamboo_smtp.svg)](http://inch-ci.org/github/fewlinesco/bamboo_smtp)
 
@@ -32,6 +33,7 @@ The package can be installed as:
   config :my_app, MyApp.Mailer,
     adapter: Bamboo.SMTPAdapter,
     server: "smtp.domain",
+    hostname: "your.domain",
     port: 1025,
     username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
     password: "pa55word", # or {:system, "SMTP_PASSWORD"}
@@ -44,26 +46,21 @@ The package can be installed as:
 *Sensitive credentials should not be committed to source control and are best kept in environment variables.
 Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*
 
+The *hostname* option sets the FQDN to the header of your emails, its optional, but if you don't set it, the underlying `gen_smtp` module will use the hostname of your machine, like `localhost`.
+
 4. Follow Bamboo [Getting Started Guide](https://github.com/thoughtbot/bamboo#getting-started)
 
 ## Usage
 
 You can find more information about advanced features in the [Wiki](https://github.com/fewlinesco/bamboo_smtp/wiki).
 
+## Code of Conduct
+
+By participating in this project, you agree to abide by its [CODE OF CONDUCT](CODE_OF_CONDUCT.md)
+
 ## Contributing
 
-Before opening a pull request you can open an issue if you have any question or need some guidance.
-
-Here's how to setup the project:
-
-```
-$ git clone https://github.com/fewlinesco/bamboo_smtp.git
-$ cd bamboo_smtp
-$ mix deps.get
-$ mix test
-```
-
-Once you've made your additions and `mix test` passes, go ahead and open a Pull Request.
+You can see the specific [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 ## License
 

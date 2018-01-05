@@ -5,8 +5,8 @@ defmodule BambooSmtp.Mixfile do
 
   def project do
     [app: :bamboo_smtp,
-     version: "1.4.0",
-     elixir: ">= 1.2.3",
+     version: "1.5.0-rc.2",
+     elixir: "~> 1.4.0",
      source_url: @project_url,
      homepage_url: @project_url,
      name: "Bamboo SMTP Adapter",
@@ -25,11 +25,11 @@ defmodule BambooSmtp.Mixfile do
 
   defp deps do
     [
-      {:bamboo, "~> 0.8.0"},
-      {:credo, "~> 0.5.3", only: [:dev, :test]},
+      {:bamboo, "~> 1.0.0-rc.2"},
+      {:credo, "~> 0.8.2", only: [:dev, :test]},
       {:earmark, ">= 1.0.3", only: :dev},
-      {:ex_doc, "~> 0.14.5", only: :dev},
-      {:excoveralls, "~> 0.6.0", only: :test},
+      {:ex_doc, "~> 0.16.2", only: :dev},
+      {:excoveralls, "~> 0.7.1", only: :test},
       {:gen_smtp, "~> 0.12.0"},
       {:inch_ex, "~> 0.5.5", only: :docs}
     ]
