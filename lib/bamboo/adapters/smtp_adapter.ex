@@ -116,11 +116,14 @@ defmodule Bamboo.SMTPAdapter do
     body
   end
   defp add_html_body(body, %Bamboo.Email{html_body: html_body}, multi_part_delimiter) do
+    base64_html_body = base64_and_split(html_body)
+
     body
     |> add_multipart_delimiter(multi_part_delimiter)
     |> add_smtp_header_line("Content-Type", "text/html;charset=UTF-8")
+    |> add_smtp_line("Content-Transfer-Encoding: base64")
     |> add_smtp_line("")
-    |> add_smtp_line(html_body)
+    |> add_smtp_line(base64_html_body)
   end
 
   defp add_from(body, %Bamboo.Email{from: from}) do
@@ -166,6 +169,14 @@ defmodule Bamboo.SMTPAdapter do
     "=?UTF-8?B?#{Base.encode64(content)}?="
   end
 
+  def base64_and_split(data) do
+    data
+     |> Base.encode64()
+     |> Stream.unfold(&String.split_at(&1, 76))
+     |> Enum.take_while(&(&1 != ""))
+     |> Enum.join("\r\n")
+  end
+
   defp add_text_body(body, %Bamboo.Email{text_body: text_body}, _multi_part_delimiter)
   when text_body == nil do
     body
@@ -188,13 +199,8 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp add_attachment_body(body, data) do
-    data =
-      data
-      |> Base.encode64()
-      |> Stream.unfold(&String.split_at(&1, 76))
-      |> Enum.take_while(&(&1 != ""))
-      |> Enum.join("\r\n")
-    add_smtp_line(body, data)
+    base64_data = base64_and_split(data)
+    add_smtp_line(body, base64_data)
   end
 
   defp add_attachment(nil, _), do: ""

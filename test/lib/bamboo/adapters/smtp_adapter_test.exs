@@ -313,8 +313,9 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
     assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/html;charset=UTF-8\r\n" <>
+                                        "Content-Transfer-Encoding: base64\r\n" <>
                                         "\r\n" <>
-                                        "#{bamboo_email.html_body}\r\n")
+                                        "#{SMTPAdapter.base64_and_split(bamboo_email.html_body)}\r\n")
     refute String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/plain;charset=UTF-8\r\n" <>
                                         "\r\n")
@@ -387,6 +388,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
     [{{from, to, raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
+
     [multipart_header] =
       Regex.run(
         ~r{Content-Type: multipart/alternative; boundary="([^"]+)"\r\n},
@@ -407,8 +409,9 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
     assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/html;charset=UTF-8\r\n" <>
+                                        "Content-Transfer-Encoding: base64\r\n" <>
                                         "\r\n" <>
-                                        "#{bamboo_email.html_body}\r\n")
+                                        "#{SMTPAdapter.base64_and_split(bamboo_email.html_body)}\r\n")
     assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
                                         "Content-Type: text/plain;charset=UTF-8\r\n" <>
                                         "\r\n" <>
