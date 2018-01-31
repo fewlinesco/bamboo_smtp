@@ -1,8 +1,10 @@
 sudo: required
 language: elixir
 elixir:
-  - 1.4.0
   - 1.4.5
+  - 1.5.3
+  - 1.6.0
+  - 1.6.1
 otp_release:
   - 18.3
   - 19.3
@@ -11,6 +13,10 @@ matrix:
   exclude:
     - elixir: 1.4.0
       otp_release: 20.0
+    - elixir: 1.6.0
+      otp_release: 18.3
+    - elixir: 1.6.1
+      otp_release: 18.3
 cache:
   directories:
     - _build
