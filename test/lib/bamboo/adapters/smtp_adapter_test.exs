@@ -65,7 +65,8 @@ defmodule Bamboo.SMTPAdapterTest do
     hostname: "your.domain",
     username: "your.name@your.domain",
     password: "pa55word",
-    transport: FakeGenSMTP
+    transport: FakeGenSMTP,
+    no_mx_lookups: false
   }
 
   @email [
@@ -249,6 +250,24 @@ defmodule Bamboo.SMTPAdapterTest do
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert [:"tlsv1", :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
+  end
+
+  test "sets no_mx_lookups false from System when specified" do
+    System.put_env("NO_MX_LOOKUPS", "false")
+    config = SMTPAdapter.handle_config(configuration(%{no_mx_lookups: {:system, "NO_MX_LOOKUPS"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    refute gen_smtp_config[:no_mx_lookups]
+  end
+
+  test "sets no_mx_lookups true from System when specified" do
+    System.put_env("NO_MX_LOOKUPS", "true")
+    config = SMTPAdapter.handle_config(configuration(%{no_mx_lookups: {:system, "NO_MX_LOOKUPS"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:no_mx_lookups]
   end
 
   test "emails raise an exception when configuration is wrong" do
@@ -460,6 +479,7 @@ defmodule Bamboo.SMTPAdapterTest do
     assert bamboo_config[:tls] == gen_smtp_config[:tls]
     assert bamboo_config[:ssl] == gen_smtp_config[:ssl]
     assert bamboo_config[:retries] == gen_smtp_config[:retries]
+    assert bamboo_config[:no_mx_lookups] == gen_smtp_config[:no_mx_lookups]
   end
 
   defp configuration(override \\ %{}), do: Map.merge(@configuration, override)
