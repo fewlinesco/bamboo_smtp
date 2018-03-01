@@ -40,7 +40,8 @@ The package can be installed as:
     tls: :if_available, # can be `:always` or `:never`
     allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"], # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
     ssl: false, # can be `true`
-    retries: 1
+    retries: 1,
+    no_mx_lookups: false # can be `true`
   ```
 
 *Sensitive credentials should not be committed to source control and are best kept in environment variables.
