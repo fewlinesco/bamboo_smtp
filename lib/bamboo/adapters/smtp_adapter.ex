@@ -21,8 +21,9 @@ defmodule Bamboo.SMTPAdapter do
         tls: :if_available, # can be `:always` or `:never`
         allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
         # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
-        ssl: :false, # can be `:true`
-        retries: 1
+        ssl: false, # can be `true`,
+        retries: 1,
+        no_mx_lookups: false # can be `true`
 
       # Define a Mailer. Maybe in lib/my_app/mailer.ex
       defmodule MyApp.Mailer do
@@ -393,6 +394,15 @@ defmodule Bamboo.SMTPAdapter do
   end
   defp to_gen_smtp_server_config({:hostname, value}, config) when is_binary(value) do
     [{:hostname, value} | config]
+  end
+  defp to_gen_smtp_server_config({:no_mx_lookups, "true"}, config) do
+    [{:no_mx_lookups, true} | config]
+  end
+  defp to_gen_smtp_server_config({:no_mx_lookups, "false"}, config) do
+    [{:no_mx_lookups, false} | config]
+  end
+  defp to_gen_smtp_server_config({:no_mx_lookups, value}, config) when is_boolean(value) do
+    [{:no_mx_lookups, value} | config]
   end
   defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
     to_gen_smtp_server_config({conf, System.get_env(var)}, config)
