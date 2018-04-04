@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.5.0-rc.3 - 2018-04-04
+
+- Add no_mx_lookups option to gen_smtp config ([#82])
+- relax Elixir version ([#81])
+- Fix failing HexDoc redirection ([#79])
+
+[#79]: https://github.com/fewlinesco/bamboo_smtp/pull/79
+[#81]: https://github.com/fewlinesco/bamboo_smtp/pull/81
+[#82]: https://github.com/fewlinesco/bamboo_smtp/pull/82
+
 ## 1.5.0-rc.2 - 2018-01-05
 
 * Add attachment support ([#35])
