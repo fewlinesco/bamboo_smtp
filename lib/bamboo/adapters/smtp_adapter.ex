@@ -404,6 +404,15 @@ defmodule Bamboo.SMTPAdapter do
   defp to_gen_smtp_server_config({:no_mx_lookups, value}, config) when is_boolean(value) do
     [{:no_mx_lookups, value} | config]
   end
+  defp to_gen_smtp_server_config({:auth, "if_available"}, config) do
+    [{:auth, :if_available} | config]
+  end
+  defp to_gen_smtp_server_config({:auth, "always"}, config) do
+    [{:auth, :always} | config]
+  end
+  defp to_gen_smtp_server_config({:auth, value}, config) when is_atom(value) do
+    [{:auth, value} | config]
+  end
   defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
     to_gen_smtp_server_config({conf, System.get_env(var)}, config)
   end
