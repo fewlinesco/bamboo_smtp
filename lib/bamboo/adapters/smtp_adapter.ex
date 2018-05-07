@@ -23,7 +23,8 @@ defmodule Bamboo.SMTPAdapter do
         # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
         ssl: false, # can be `true`,
         retries: 1,
-        no_mx_lookups: false # can be `true`
+        no_mx_lookups: false, # can be `true`
+        auth: :if_available # can be `always`. If your smtp relay requires authentication set it to `always`.
 
       # Define a Mailer. Maybe in lib/my_app/mailer.ex
       defmodule MyApp.Mailer do
@@ -36,7 +37,7 @@ defmodule Bamboo.SMTPAdapter do
   require Logger
 
   @required_configuration [:server, :port]
-  @default_configuration %{tls: :if_available, ssl: :false, retries: 1, transport: :gen_smtp_client}
+  @default_configuration %{tls: :if_available, ssl: :false, retries: 1, transport: :gen_smtp_client, auth: :if_available}
   @tls_versions ~w(tlsv1 tlsv1.1 tlsv1.2)
 
   defmodule SMTPError do
