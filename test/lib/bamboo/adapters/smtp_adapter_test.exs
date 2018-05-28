@@ -286,6 +286,38 @@ defmodule Bamboo.SMTPAdapterTest do
     end
   end
 
+  test "sets default auth key if not present" do
+    %{auth: auth} = SMTPAdapter.handle_config(configuration())
+
+    assert :if_available == auth
+  end
+
+  test "doesn't set a default auth key if present" do
+    %{auth: auth} = SMTPAdapter.handle_config(configuration(%{auth: :always}))
+
+    assert :always == auth
+  end
+
+  test "sets auth if_available from System when specified" do
+    System.put_env("AUTH", "if_available")
+
+    config = SMTPAdapter.handle_config(configuration(%{auth: {:system, "AUTH"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:auth] == :if_available
+  end
+
+  test "sets auth always from System when specified" do
+    System.put_env("AUTH", "always")
+
+    config = SMTPAdapter.handle_config(configuration(%{auth: {:system, "AUTH"}}))
+    :ok = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:auth] == :always
+  end
+
   test "emails raise an exception when email can't be sent" do
     bamboo_email = new_email(from: {"Wrong User", "wrong@user.com"})
     bamboo_config = configuration()
