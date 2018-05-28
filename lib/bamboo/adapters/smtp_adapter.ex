@@ -37,7 +37,13 @@ defmodule Bamboo.SMTPAdapter do
   require Logger
 
   @required_configuration [:server, :port]
-  @default_configuration %{tls: :if_available, ssl: :false, retries: 1, transport: :gen_smtp_client, auth: :if_available}
+  @default_configuration %{
+    tls: :if_available,
+    ssl: :false,
+    retries: 1,
+    transport: :gen_smtp_client,
+    auth: :if_available
+  }
   @tls_versions ~w(tlsv1 tlsv1.1 tlsv1.2)
 
   defmodule SMTPError do
