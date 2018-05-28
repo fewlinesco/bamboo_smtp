@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.5.0-rc.4 - 2018-05-28
+
+- Add authentication option ([#89])
+
+[#89]: https://github.com/fewlinesco/bamboo_smtp/pull/89
+
 ## 1.5.0-rc.3 - 2018-04-04
 
 - Add no_mx_lookups option to gen_smtp config ([#82])
