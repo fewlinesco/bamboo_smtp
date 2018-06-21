@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.0 - 2018-06-21
+
+- Bump to Bamboo 1.0.0
+
 ## 1.5.0-rc.4 - 2018-05-28
 
 - Add authentication option ([#89])
