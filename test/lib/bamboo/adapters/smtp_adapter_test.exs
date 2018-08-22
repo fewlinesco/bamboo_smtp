@@ -115,6 +115,18 @@ defmodule Bamboo.SMTPAdapterTest do
     end
   end
 
+  test "raises if username is nil" do
+    assert_raise ArgumentError, ~r/Key username is required/, fn ->
+      SMTPAdapter.handle_config(configuration(%{username: nil}))
+    end
+  end
+
+  test "raises if password is nil" do
+    assert_raise ArgumentError, ~r/Key password is required/, fn ->
+      SMTPAdapter.handle_config(configuration(%{password: nil}))
+    end
+  end
+
   test "sets default tls key if not present" do
     %{tls: tls} = SMTPAdapter.handle_config(configuration())
 
