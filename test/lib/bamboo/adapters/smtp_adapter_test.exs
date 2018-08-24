@@ -303,6 +303,19 @@ defmodule Bamboo.SMTPAdapterTest do
     end
   end
 
+  test "deliver is successful when username and password are required and present" do
+    bamboo_email = new_email()
+
+    bamboo_config =
+      configuration(%{
+        username: "a",
+        password: "b",
+        auth: :always
+      })
+
+    assert :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+  end
+
   test "deliver is successful when username and password configuration are not required" do
     bamboo_email = new_email()
 
