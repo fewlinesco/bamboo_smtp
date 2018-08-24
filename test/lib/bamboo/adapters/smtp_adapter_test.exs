@@ -7,6 +7,11 @@ defmodule Bamboo.SMTPAdapterTest do
   defmodule FakeGenSMTP do
     use GenServer
 
+    @impl true
+    def init(args) do
+      {:ok, args}
+    end
+
     def start_link do
       GenServer.start_link(__MODULE__, [], name: __MODULE__)
     end
@@ -19,10 +24,12 @@ defmodule Bamboo.SMTPAdapterTest do
       GenServer.call(__MODULE__, :fetch_emails)
     end
 
+    @impl true
     def handle_call(:fetch_emails, _from, state) do
       {:reply, state, state}
     end
 
+    @impl true
     def handle_call({:send_email, {email, config}}, _from, state) do
       case check_validity(email, config) do
         :ok ->
