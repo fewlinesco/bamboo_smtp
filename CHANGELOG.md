@@ -1,8 +1,16 @@
 # CHANGELOG
 
+## 1.6.0 - 2018-09-10
+
+- Relax bamboo version dependency to allow v1.1.x
+
+[#100]: https://github.com/fewlinesco/bamboo_smtp/pull/100
+
 ## 1.5.0 - 2018-06-21
 
 - Bump to Bamboo 1.0.0
+
+[#94]: https://github.com/fewlinesco/bamboo_smtp/pull/94
 
 ## 1.5.0-rc.4 - 2018-05-28
 
