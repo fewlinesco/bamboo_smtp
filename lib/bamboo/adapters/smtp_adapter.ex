@@ -187,7 +187,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp add_attachment_header(body, attachment) do
-    case attachment.cid do
+    case attachment.content_id do
       nil ->
         add_common_attachment_header(body, attachment)
       cid ->
