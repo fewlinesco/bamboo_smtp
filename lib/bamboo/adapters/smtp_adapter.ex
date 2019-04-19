@@ -55,11 +55,11 @@ defmodule Bamboo.SMTPAdapter do
       message = """
       There was a problem sending the email through SMTP.
 
-      The error is #{inspect reason}
+      The error is #{inspect(reason)}
 
       More detail below:
 
-      #{inspect detail}
+      #{inspect(detail)}
       """
 
       %SMTPError{message: message, raw: raw}
@@ -88,9 +88,14 @@ defmodule Bamboo.SMTPAdapter do
   @doc false
   def supports_attachments?, do: true
 
+  defp handle_response({:error, :no_credentials = reason}) do
+    raise SMTPError, {reason, "Username and password were not provided for authentication."}
+  end
+
   defp handle_response({:error, reason, detail}) do
     raise SMTPError, {reason, detail}
   end
+
   defp handle_response(_) do
     :ok
   end
