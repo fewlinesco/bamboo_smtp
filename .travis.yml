@@ -16,6 +16,10 @@ matrix:
       otp_release: 20.3
     - elixir: 1.6.5
       otp_release: 21.3
+    - elixir: 1.6.5
+      otp_release: 22.0
+    - elixr: 1.6.6
+      otp_release: 22.0
 cache:
   directories:
     - _build
