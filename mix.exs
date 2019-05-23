@@ -29,7 +29,7 @@ defmodule BambooSmtp.Mixfile do
     [
       {:bamboo, "~> 1.0"},
       {:credo, "~> 1.0.5", only: [:dev, :test]},
-      {:earmark, ">= 1.0.3", only: :dev},
+      {:earmark, ">= 1.3.2", only: :dev},
       {:ex_doc, "~> 0.16.2", only: :dev},
       {:excoveralls, "~> 0.7.1", only: :test},
       {:gen_smtp, "~> 0.12.0"},
