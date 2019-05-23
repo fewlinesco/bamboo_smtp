@@ -22,6 +22,7 @@ cache:
     - _build
     - deps
 script:
+  - mix compile --warnings-as-errors
   - mix test
   - mix credo --strict
 after_script:
