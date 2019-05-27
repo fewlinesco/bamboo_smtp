@@ -7,6 +7,11 @@ defmodule Bamboo.SMTPAdapterTest do
   defmodule FakeGenSMTP do
     use GenServer
 
+    @impl true
+    def init(args) do
+      {:ok, args}
+    end
+
     def start_link do
       GenServer.start_link(__MODULE__, [], name: __MODULE__)
     end
@@ -19,14 +24,17 @@ defmodule Bamboo.SMTPAdapterTest do
       GenServer.call(__MODULE__, :fetch_emails)
     end
 
+    @impl true
     def handle_call(:fetch_emails, _from, state) do
       {:reply, state, state}
     end
 
+    @impl true
     def handle_call({:send_email, {email, config}}, _from, state) do
       case check_validity(email, config) do
         :ok ->
           {:reply, :ok, [{email, config} | state]}
+
         error ->
           {:reply, error, state}
       end
@@ -34,14 +42,23 @@ defmodule Bamboo.SMTPAdapterTest do
 
     defp check_validity(email, config) do
       with :ok <- check_configuration(config),
+           :ok <- check_credentials(config[:username], config[:password], config[:auth]),
            :ok <- check_email(email),
-      do: :ok
+           do: :ok
     end
+
+    defp check_credentials(username, password, :always = _auth)
+         when is_nil(username) or is_nil(password) do
+      {:error, :no_credentials}
+    end
+
+    defp check_credentials(_username, _password, _auth), do: :ok
 
     defp check_configuration(config) do
       case Keyword.fetch(config, :relay) do
         {:ok, wrong_domain = "wrong.smtp.domain"} ->
           {:error, :retries_exceeded, {:network_failure, wrong_domain, {:error, :nxdomain}}}
+
         _ ->
           :ok
       end
@@ -270,7 +287,56 @@ defmodule Bamboo.SMTPAdapterTest do
     assert gen_smtp_config[:no_mx_lookups]
   end
 
-  test "emails raise an exception when configuration is wrong" do
+  test "deliver raises an exception when username and password configuration are required" do
+    bamboo_email = new_email()
+
+    bamboo_config =
+      configuration(%{
+        username: nil,
+        password: nil,
+        auth: :always
+      })
+
+    assert_raise SMTPAdapter.SMTPError, ~r/no_credentials/, fn ->
+      SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    end
+
+    try do
+      SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    rescue
+      error in SMTPAdapter.SMTPError ->
+        assert {:no_credentials, "Username and password were not provided for authentication."} =
+                 error.raw
+    end
+  end
+
+  test "deliver is successful when username and password are required and present" do
+    bamboo_email = new_email()
+
+    bamboo_config =
+      configuration(%{
+        username: "a",
+        password: "b",
+        auth: :always
+      })
+
+    assert :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+  end
+
+  test "deliver is successful when username and password configuration are not required" do
+    bamboo_email = new_email()
+
+    bamboo_config =
+      configuration(%{
+        username: nil,
+        password: nil,
+        auth: :if_available
+      })
+
+    assert :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+  end
+
+  test "deliver raises an exception when server configuration is wrong" do
     bamboo_email = new_email()
     bamboo_config = configuration(%{server: "wrong.smtp.domain"})
 
