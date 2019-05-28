@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.7.0 - 2019-05-27
+
+- Update Elixir, OTP and all deps to latest versions available ([#115])
+- SMTPAdapter now raise an error when credentials are required by configuration but not provided ([#102])
+
+[#115]: https://github.com/fewlinesco/bamboo_smtp/pull/115
+[#102]: https://github.com/fewlinesco/bamboo_smtp/pull/102
+
 ## 1.6.0 - 2018-09-10
 
 - Relax bamboo version dependency to allow v1.1.x
