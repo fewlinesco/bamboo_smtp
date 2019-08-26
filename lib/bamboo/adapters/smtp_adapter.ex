@@ -96,8 +96,8 @@ defmodule Bamboo.SMTPAdapter do
     raise SMTPError, {reason, detail}
   end
 
-  defp handle_response(_) do
-    :ok
+  defp handle_response(response) do
+    {:ok, response}
   end
 
   defp add_bcc(body, %Bamboo.Email{bcc: recipients}) do
