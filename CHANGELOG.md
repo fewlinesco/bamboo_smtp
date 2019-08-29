@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.0.0 - 2019-08-27
+
+- SMTPAdapter now returns the SMTP server response ([#122])
+
+**UPGRADE NOTES**
+
+In case you were using the `response: true` option, be aware that you'll now get a tuple as a return value in the form of `{:ok, <raw-smtp-response>}` instead of an atom `:ok`.
+
+[#122]: https://github.com/fewlinesco/bamboo_smtp/pull/122
+
 ## 1.7.0 - 2019-05-27
 
 - Update Elixir, OTP and all deps to latest versions available ([#115])
