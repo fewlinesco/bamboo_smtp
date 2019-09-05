@@ -39,7 +39,7 @@ defmodule BambooSmtp.Mixfile do
 
   defp ex_doc_version do
     if Version.match?(System.version(), "~> 1.7") do
-      "~> 0.20.2"
+      "~> 0.21.2"
     else
       "~> 0.18.4"
     end
