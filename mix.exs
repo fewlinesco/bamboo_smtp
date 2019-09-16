@@ -33,7 +33,8 @@ defmodule BambooSmtp.Mixfile do
       {:excoveralls, "~> 0.11.1", only: :test},
       {:ex_doc, ex_doc_version(), only: :docs},
       {:gen_smtp, "~> 0.14.0"},
-      {:inch_ex, "~> 2.0.0", only: :docs}
+      {:inch_ex, "~> 2.0.0", only: :docs},
+      {:mail, "~> 0.2"}
     ]
   end
 

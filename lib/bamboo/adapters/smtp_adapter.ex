@@ -66,6 +66,7 @@ defmodule Bamboo.SMTPAdapter do
     end
   end
 
+  @impl Bamboo.Adapter
   def deliver(email, config) do
     gen_smtp_config =
       config
@@ -79,6 +80,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   @doc false
+  @impl Bamboo.Adapter
   def handle_config(config) do
     config
     |> check_required_configuration
@@ -86,6 +88,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   @doc false
+  @impl Bamboo.Adapter
   def supports_attachments?, do: true
 
   defp handle_response({:error, :no_credentials = reason}) do
@@ -100,134 +103,8 @@ defmodule Bamboo.SMTPAdapter do
     {:ok, response}
   end
 
-  defp add_bcc(body, %Bamboo.Email{bcc: recipients}) do
-    add_smtp_header_line(body, :bcc, format_email_as_string(recipients, :bcc))
-  end
-
-  defp add_cc(body, %Bamboo.Email{cc: recipients}) do
-    add_smtp_header_line(body, :cc, format_email_as_string(recipients, :cc))
-  end
-
-  defp add_custom_header(body, {key, value}) do
-    add_smtp_header_line(body, key, value)
-  end
-
-  defp add_custom_headers(body, %Bamboo.Email{headers: headers}) do
-    Enum.reduce(headers, body, &add_custom_header(&2, &1))
-  end
-
-  defp add_ending_header(body) do
-    add_smtp_line(body, "")
-  end
-
-  defp add_ending_multipart(body, delimiter) do
-    add_smtp_line(body, "--#{delimiter}--")
-  end
-
-  defp add_html_body(body, %Bamboo.Email{html_body: html_body}, _multi_part_delimiter)
-  when html_body == nil do
-    body
-  end
-  defp add_html_body(body, %Bamboo.Email{html_body: html_body}, multi_part_delimiter) do
-    body
-    |> add_multipart_delimiter(multi_part_delimiter)
-    |> add_smtp_header_line("Content-Type", "text/html;charset=UTF-8")
-    |> add_smtp_line("")
-    |> add_smtp_line(html_body)
-  end
-
-  defp add_from(body, %Bamboo.Email{from: from}) do
-    add_smtp_header_line(body, :from, format_email_as_string(from, :from))
-  end
-
-  defp add_mime_header(body) do
-    add_smtp_header_line(body, "MIME-Version", "1.0")
-  end
-
-  defp add_multipart_delimiter(body, delimiter) do
-    add_smtp_line(body, "--#{delimiter}")
-  end
-
-  defp add_multipart_header(body, delimiter) do
-    add_smtp_header_line(body, "Content-Type", ~s(multipart/alternative; boundary="#{delimiter}"))
-  end
-
-  defp add_multipart_mixed_header(body, delimiter) do
-    add_smtp_header_line(body, "Content-Type", ~s(multipart/mixed; boundary="#{delimiter}"))
-  end
-
-  defp add_smtp_header_line(body, type, content) when is_list(content) do
-    Enum.reduce(content, body, &add_smtp_header_line(&2, type, &1))
-  end
-  defp add_smtp_header_line(body, type, content) when is_atom(type) do
-    add_smtp_header_line(body, String.capitalize(to_string(type)), content)
-  end
-  defp add_smtp_header_line(body, type, content) when is_binary(type) do
-    add_smtp_line(body, "#{type}: #{content}")
-  end
-
-  defp add_smtp_line(body, content), do: body <> content <> "\r\n"
-
-  defp add_subject(body, %Bamboo.Email{subject: subject}) when is_nil(subject) do
-    add_smtp_header_line(body, :subject, "")
-  end
-  defp add_subject(body, %Bamboo.Email{subject: subject}) do
-    add_smtp_header_line(body, :subject, rfc822_encode(subject))
-  end
-
   defp rfc822_encode(content) do
     "=?UTF-8?B?#{Base.encode64(content)}?="
-  end
-
-  defp add_text_body(body, %Bamboo.Email{text_body: text_body}, _multi_part_delimiter)
-  when text_body == nil do
-    body
-  end
-  defp add_text_body(body, %Bamboo.Email{text_body: text_body}, multi_part_delimiter) do
-    body
-    |> add_multipart_delimiter(multi_part_delimiter)
-    |> add_smtp_header_line("Content-Type", "text/plain;charset=UTF-8")
-    |> add_smtp_line("")
-    |> add_smtp_line(text_body)
-  end
-
-  defp add_attachment_header(body, attachment) do
-    << random :: size(32) >> = :crypto.strong_rand_bytes(4)
-    body
-    |> add_smtp_line("Content-Type: #{attachment.content_type}; name=\"#{attachment.filename}\"")
-    |> add_smtp_line("Content-Disposition: attachment; filename=\"#{attachment.filename}\"")
-    |> add_smtp_line("Content-Transfer-Encoding: base64")
-    |> add_smtp_line("X-Attachment-Id: #{random}")
-  end
-
-  defp add_attachment_body(body, data) do
-    data =
-      data
-      |> Base.encode64()
-      |> Stream.unfold(&String.split_at(&1, 76))
-      |> Enum.take_while(&(&1 != ""))
-      |> Enum.join("\r\n")
-    add_smtp_line(body, data)
-  end
-
-  defp add_attachment(nil, _), do: ""
-  defp add_attachment(attachment, multi_part_mixed_delimiter) do
-    ""
-    |> add_multipart_delimiter(multi_part_mixed_delimiter)
-    |> add_attachment_header(attachment)
-    |> add_smtp_line("")
-    |> add_attachment_body(attachment.data)
-  end
-
-  defp add_attachments(body, %Bamboo.Email{attachments: nil}, _), do: body
-  defp add_attachments(body, %Bamboo.Email{attachments: attachments}, multi_part_mixed_delimiter) do
-    attachment_part =
-      attachments |> Enum.map(fn(attachment) -> add_attachment(attachment, multi_part_mixed_delimiter) end)
-    "#{body}#{attachment_part}"
-  end
-
-  defp add_to(body, %Bamboo.Email{to: recipients}) do
-    add_smtp_header_line(body, :to, format_email_as_string(recipients, :to))
   end
 
   defp aggregate_errors(config, key, errors) do
@@ -243,32 +120,23 @@ defmodule Bamboo.SMTPAdapter do
     Map.put_new(config, key, default_value)
   end
 
-  defp generate_multi_part_delimiter do
-    << random1 :: size(32), random2 :: size(32), random3 :: size(32) >> = :crypto.strong_rand_bytes(12)
-    "----=_Part_#{random1}_#{random2}.#{random3}"
-  end
-
   defp body(email = %Bamboo.Email{}) do
-    multi_part_delimiter = generate_multi_part_delimiter()
-    multi_part_mixed_delimiter = generate_multi_part_delimiter()
-    ""
-    |> add_subject(email)
-    |> add_from(email)
-    |> add_bcc(email)
-    |> add_cc(email)
-    |> add_to(email)
-    |> add_custom_headers(email)
-    |> add_mime_header
-    |> add_multipart_mixed_header(multi_part_mixed_delimiter)
-    |> add_ending_header
-    |> add_multipart_delimiter(multi_part_mixed_delimiter)
-    |> add_multipart_header(multi_part_delimiter)
-    |> add_ending_header
-    |> add_text_body(email, multi_part_delimiter)
-    |> add_html_body(email, multi_part_delimiter)
-    |> add_ending_multipart(multi_part_delimiter)
-    |> add_attachments(email, multi_part_mixed_delimiter)
-    |> add_ending_multipart(multi_part_mixed_delimiter)
+    message =
+      Mail.build_multipart()
+      |> Mail.put_subject(email.subject || "")
+      |> Mail.put_from(email.from)
+      |> Mail.put_bcc(email.bcc)
+      |> Mail.put_cc(email.cc)
+      |> Mail.put_to(email.to)
+      |> Mail.put_text(email.text_body || "")
+      |> Mail.put_html(email.html_body || "")
+
+    message =
+      Enum.reduce(email.attachments, message, fn attachment, message ->
+        Mail.put_attachment(message, {attachment.filename, attachment.data})
+      end)
+
+    Mail.Renderers.RFC2822.render(message)
   end
 
   defp build_error({:ok, value}, _key, errors) when value != nil, do: errors
@@ -293,19 +161,6 @@ defmodule Bamboo.SMTPAdapter do
     email
     |> Bamboo.Formatter.format_email_address(type)
     |> format_email(format)
-  end
-
-  defp format_email_as_string(emails) when is_list(emails) do
-    Enum.join(emails, ", ")
-  end
-  defp format_email_as_string(email) do
-    email
-  end
-
-  defp format_email_as_string(email, type) do
-    email
-    |> format_email(type)
-    |> format_email_as_string
   end
 
   defp from_without_format(%Bamboo.Email{from: from}) do
