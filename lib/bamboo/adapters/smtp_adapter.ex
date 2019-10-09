@@ -100,7 +100,7 @@ defmodule Bamboo.SMTPAdapter do
     {:ok, response}
   end
 
-  defp add_bcc(body, %Bamboo.Email{bcc: recipients}) when length(recipients) == 0 do
+  defp add_bcc(body, %Bamboo.Email{bcc: []}) do
     body
   end
 
@@ -108,7 +108,7 @@ defmodule Bamboo.SMTPAdapter do
     add_smtp_header_line(body, :bcc, format_email_as_string(recipients, :bcc))
   end
 
-  defp add_cc(body, %Bamboo.Email{cc: recipients}) when length(recipients) == 0 do
+  defp add_cc(body, %Bamboo.Email{cc: []}) do
     body
   end
 
