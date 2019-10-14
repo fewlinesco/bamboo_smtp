@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.0 - 2019-10-14
+
+- SMTPAdapter now does not append `Bcc` and `Cc` headers to the body if there is not any provided.
+
 ## 2.0.0 - 2019-08-27
 
 - SMTPAdapter now returns the SMTP server response ([#122])
