@@ -24,7 +24,7 @@ defmodule Bamboo.SMTPAdapter do
         ssl: false, # can be `true`,
         retries: 1,
         no_mx_lookups: false, # can be `true`
-        auth: :if_available # can be `always`. If your smtp relay requires authentication set it to `always`.
+        auth: :if_available # can be `:always`. If your smtp relay requires authentication set it to `:always`.
 
       # Define a Mailer. Maybe in lib/my_app/mailer.ex
       defmodule MyApp.Mailer do

@@ -42,7 +42,7 @@ The package can be installed as:
     ssl: false, # can be `true`
     retries: 1,
     no_mx_lookups: false, # can be `true`
-    auth: :if_available # can be `always`. If your smtp relay requires authentication set it to `always`.
+    auth: :if_available # can be `:always`. If your smtp relay requires authentication set it to `:always`.
   ```
 
 *Sensitive credentials should not be committed to source control and are best kept in environment variables.
