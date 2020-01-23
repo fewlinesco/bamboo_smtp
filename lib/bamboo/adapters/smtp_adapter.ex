@@ -199,6 +199,16 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line(text_body)
   end
 
+  defp add_attachment_header(body, %{content_type: content_type} = attachment)
+       when content_type == "message/rfc822" do
+    <<random::size(32)>> = :crypto.strong_rand_bytes(4)
+
+    body
+    |> add_smtp_line("Content-Type: #{attachment.content_type}; name=\"#{attachment.filename}\"")
+    |> add_smtp_line("Content-Disposition: attachment; filename=\"#{attachment.filename}\"")
+    |> add_smtp_line("X-Attachment-Id: #{random}")
+  end
+
   defp add_attachment_header(body, attachment) do
     << random :: size(32) >> = :crypto.strong_rand_bytes(4)
     body
@@ -210,11 +220,17 @@ defmodule Bamboo.SMTPAdapter do
 
   defp add_attachment_body(body, data) do
     data =
-      data
-      |> Base.encode64()
-      |> Stream.unfold(&String.split_at(&1, 76))
-      |> Enum.take_while(&(&1 != ""))
-      |> Enum.join("\r\n")
+      case String.contains?(body, "Content-Type: message/rfc822") do
+        true ->
+          data
+
+        false ->
+          data
+          |> Base.encode64()
+          |> Stream.unfold(&String.split_at(&1, 76))
+          |> Enum.take_while(&(&1 != ""))
+          |> Enum.join("\r\n")
+      end
     add_smtp_line(body, data)
   end
 
