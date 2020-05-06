@@ -28,7 +28,7 @@ defmodule BambooSmtp.Mixfile do
   defp deps do
     [
       {:bamboo, "~> 1.2"},
-      {:credo, "~> 1.1.4", only: [:dev, :test]},
+      {:credo, "~> 1.4.0", only: [:dev, :test]},
       {:earmark, ">= 1.3.2", only: :docs},
       {:excoveralls, "~> 0.12.0", only: :test},
       {:ex_doc, ex_doc_version(), only: :docs},
