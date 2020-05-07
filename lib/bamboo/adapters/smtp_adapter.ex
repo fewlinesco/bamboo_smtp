@@ -23,7 +23,8 @@ defmodule Bamboo.SMTPAdapter do
         # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
         ssl: false, # can be `true`,
         retries: 1,
-        no_mx_lookups: false # can be `true`
+        no_mx_lookups: false, # can be `true`
+        auth: :if_available # can be `:always`. If your smtp relay requires authentication set it to `:always`.
 
       # Define a Mailer. Maybe in lib/my_app/mailer.ex
       defmodule MyApp.Mailer do
@@ -36,7 +37,13 @@ defmodule Bamboo.SMTPAdapter do
   require Logger
 
   @required_configuration [:server, :port]
-  @default_configuration %{tls: :if_available, ssl: :false, retries: 1, transport: :gen_smtp_client}
+  @default_configuration %{
+    tls: :if_available,
+    ssl: :false,
+    retries: 1,
+    transport: :gen_smtp_client,
+    auth: :if_available
+  }
   @tls_versions ~w(tlsv1 tlsv1.1 tlsv1.2)
 
   defmodule SMTPError do
@@ -48,11 +55,11 @@ defmodule Bamboo.SMTPAdapter do
       message = """
       There was a problem sending the email through SMTP.
 
-      The error is #{inspect reason}
+      The error is #{inspect(reason)}
 
       More detail below:
 
-      #{inspect detail}
+      #{inspect(detail)}
       """
 
       %SMTPError{message: message, raw: raw}
@@ -81,15 +88,28 @@ defmodule Bamboo.SMTPAdapter do
   @doc false
   def supports_attachments?, do: true
 
+  defp handle_response({:error, :no_credentials = reason}) do
+    raise SMTPError, {reason, "Username and password were not provided for authentication."}
+  end
+
   defp handle_response({:error, reason, detail}) do
     raise SMTPError, {reason, detail}
   end
-  defp handle_response(_) do
-    :ok
+
+  defp handle_response(response) do
+    {:ok, response}
+  end
+
+  defp add_bcc(body, %Bamboo.Email{bcc: []}) do
+    body
   end
 
   defp add_bcc(body, %Bamboo.Email{bcc: recipients}) do
     add_smtp_header_line(body, :bcc, format_email_as_string(recipients, :bcc))
+  end
+
+  defp add_cc(body, %Bamboo.Email{cc: []}) do
+    body
   end
 
   defp add_cc(body, %Bamboo.Email{cc: recipients}) do
@@ -409,6 +429,15 @@ defmodule Bamboo.SMTPAdapter do
   end
   defp to_gen_smtp_server_config({:no_mx_lookups, value}, config) when is_boolean(value) do
     [{:no_mx_lookups, value} | config]
+  end
+  defp to_gen_smtp_server_config({:auth, "if_available"}, config) do
+    [{:auth, :if_available} | config]
+  end
+  defp to_gen_smtp_server_config({:auth, "always"}, config) do
+    [{:auth, :always} | config]
+  end
+  defp to_gen_smtp_server_config({:auth, value}, config) when is_atom(value) do
+    [{:auth, value} | config]
   end
   defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
     to_gen_smtp_server_config({conf, System.get_env(var)}, config)

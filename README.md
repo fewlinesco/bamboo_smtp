@@ -14,7 +14,7 @@ The package can be installed as:
 
   ```elixir
   def deps do
-    [{:bamboo_smtp, "~> 1.4.0"}]
+    [{:bamboo_smtp, "~> 2.1.0"}]
   end
   ```
 
@@ -38,10 +38,11 @@ The package can be installed as:
     username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
     password: "pa55word", # or {:system, "SMTP_PASSWORD"}
     tls: :if_available, # can be `:always` or `:never`
-    allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"], # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
+    allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"], # or {:system, "ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
     ssl: false, # can be `true`
     retries: 1,
-    no_mx_lookups: false # can be `true`
+    no_mx_lookups: false, # can be `true`
+    auth: :if_available # can be `:always`. If your smtp relay requires authentication set it to `:always`.
   ```
 
 *Sensitive credentials should not be committed to source control and are best kept in environment variables.

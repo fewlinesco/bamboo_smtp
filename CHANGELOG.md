@@ -1,5 +1,61 @@
 # CHANGELOG
 
+## 2.1.0 - 2019-10-14
+
+- SMTPAdapter now does not append `Bcc` and `Cc` headers to the body if there is not any provided ([#130]).
+- Bump `gen_smtp` version to `~> 0.15.0` ([#129]).
+- Bump `ex_doc` version for system version at least equal to `1.7` ([#127]).
+
+[#130]: https://github.com/fewlinesco/bamboo_smtp/pull/130
+[#129]: https://github.com/fewlinesco/bamboo_smtp/pull/129
+[#127]: https://github.com/fewlinesco/bamboo_smtp/pull/127
+
+## 2.0.0 - 2019-08-27
+
+- SMTPAdapter now returns the SMTP server response ([#122])
+
+**UPGRADE NOTES**
+
+In case you were using the `response: true` option, be aware that you'll now get a tuple as a return value in the form of `{:ok, <raw-smtp-response>}` instead of an atom `:ok`.
+
+[#122]: https://github.com/fewlinesco/bamboo_smtp/pull/122
+
+## 1.7.0 - 2019-05-27
+
+- Update Elixir, OTP and all deps to latest versions available ([#115])
+- SMTPAdapter now raise an error when credentials are required by configuration but not provided ([#102])
+
+[#115]: https://github.com/fewlinesco/bamboo_smtp/pull/115
+[#102]: https://github.com/fewlinesco/bamboo_smtp/pull/102
+
+## 1.6.0 - 2018-09-10
+
+- Relax bamboo version dependency to allow v1.1.x
+
+[#100]: https://github.com/fewlinesco/bamboo_smtp/pull/100
+
+## 1.5.0 - 2018-06-21
+
+- Bump to Bamboo 1.0.0
+
+[#94]: https://github.com/fewlinesco/bamboo_smtp/pull/94
+
+## 1.5.0-rc.4 - 2018-05-28
+
+- Add authentication option ([#89])
+
+[#89]: https://github.com/fewlinesco/bamboo_smtp/pull/89
+
+## 1.5.0-rc.3 - 2018-04-04
+
+- Add no_mx_lookups option to gen_smtp config ([#82])
+- relax Elixir version ([#81])
+- Fix failing HexDoc redirection ([#79])
+
+[#79]: https://github.com/fewlinesco/bamboo_smtp/pull/79
+[#81]: https://github.com/fewlinesco/bamboo_smtp/pull/81
+[#82]: https://github.com/fewlinesco/bamboo_smtp/pull/82
+
 ## 1.5.0-rc.2 - 2018-01-05
 
 * Add attachment support ([#35])

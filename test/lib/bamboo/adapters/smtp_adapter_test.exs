@@ -7,6 +7,11 @@ defmodule Bamboo.SMTPAdapterTest do
   defmodule FakeGenSMTP do
     use GenServer
 
+    @impl true
+    def init(args) do
+      {:ok, args}
+    end
+
     def start_link do
       GenServer.start_link(__MODULE__, [], name: __MODULE__)
     end
@@ -19,14 +24,17 @@ defmodule Bamboo.SMTPAdapterTest do
       GenServer.call(__MODULE__, :fetch_emails)
     end
 
+    @impl true
     def handle_call(:fetch_emails, _from, state) do
       {:reply, state, state}
     end
 
+    @impl true
     def handle_call({:send_email, {email, config}}, _from, state) do
       case check_validity(email, config) do
         :ok ->
-          {:reply, :ok, [{email, config} | state]}
+          {:reply, "200 Ok 1234567890", [{email, config} | state]}
+
         error ->
           {:reply, error, state}
       end
@@ -34,14 +42,23 @@ defmodule Bamboo.SMTPAdapterTest do
 
     defp check_validity(email, config) do
       with :ok <- check_configuration(config),
+           :ok <- check_credentials(config[:username], config[:password], config[:auth]),
            :ok <- check_email(email),
-      do: :ok
+           do: :ok
     end
+
+    defp check_credentials(username, password, :always = _auth)
+         when is_nil(username) or is_nil(password) do
+      {:error, :no_credentials}
+    end
+
+    defp check_credentials(_username, _password, _auth), do: :ok
 
     defp check_configuration(config) do
       case Keyword.fetch(config, :relay) do
         {:ok, wrong_domain = "wrong.smtp.domain"} ->
           {:error, :retries_exceeded, {:network_failure, wrong_domain, {:error, :nxdomain}}}
+
         _ ->
           :ok
       end
@@ -161,7 +178,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
     bamboo_email = new_email()
     bamboo_config = SMTPAdapter.handle_config(configuration(config))
-    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert gen_smtp_config[:relay] == "server"
@@ -172,7 +189,7 @@ defmodule Bamboo.SMTPAdapterTest do
     System.put_env("TLS", "if_available")
 
     config = SMTPAdapter.handle_config(configuration(%{tls: {:system, "TLS"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert gen_smtp_config[:tls] == :if_available
@@ -182,7 +199,7 @@ defmodule Bamboo.SMTPAdapterTest do
     System.put_env("TLS", "always")
 
     config = SMTPAdapter.handle_config(configuration(%{tls: {:system, "TLS"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert gen_smtp_config[:tls] == :always
@@ -192,7 +209,7 @@ defmodule Bamboo.SMTPAdapterTest do
     System.put_env("TLS", "never")
 
     config = SMTPAdapter.handle_config(configuration(%{tls: {:system, "TLS"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert gen_smtp_config[:tls] == :never
@@ -205,7 +222,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email()
     bamboo_config = configuration(%{username: {:system, "SMTP_USER"}, password: {:system, "SMTP_PASS"}})
 
-    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
@@ -217,7 +234,7 @@ defmodule Bamboo.SMTPAdapterTest do
     System.put_env("SSL", "true")
 
     config = SMTPAdapter.handle_config(configuration(%{ssl: {:system, "SSL"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert gen_smtp_config[:ssl]
@@ -226,7 +243,7 @@ defmodule Bamboo.SMTPAdapterTest do
   test "sets ssl false from System when specified" do
     System.put_env("SSL", "false")
     config = SMTPAdapter.handle_config(configuration(%{ssl: {:system, "SSL"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     refute gen_smtp_config[:ssl]
@@ -237,7 +254,7 @@ defmodule Bamboo.SMTPAdapterTest do
     System.put_env("RETRIES", "123")
 
     config = SMTPAdapter.handle_config(configuration(%{retries: {:system, "RETRIES"}}))
-    :ok = SMTPAdapter.deliver(bamboo_email, config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert 123 == gen_smtp_config[:retries]
@@ -246,16 +263,16 @@ defmodule Bamboo.SMTPAdapterTest do
   test "sets tls versions from System when specified" do
     System.put_env("ALLOWED_TLS_VERSIONS", "tlsv1,tlsv1.2")
     config = SMTPAdapter.handle_config(configuration(%{allowed_tls_versions: {:system, "ALLOWED_TLS_VERSIONS"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
-    assert [:"tlsv1", :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
+    assert [:tlsv1, :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
   end
 
   test "sets no_mx_lookups false from System when specified" do
     System.put_env("NO_MX_LOOKUPS", "false")
     config = SMTPAdapter.handle_config(configuration(%{no_mx_lookups: {:system, "NO_MX_LOOKUPS"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     refute gen_smtp_config[:no_mx_lookups]
@@ -264,13 +281,62 @@ defmodule Bamboo.SMTPAdapterTest do
   test "sets no_mx_lookups true from System when specified" do
     System.put_env("NO_MX_LOOKUPS", "true")
     config = SMTPAdapter.handle_config(configuration(%{no_mx_lookups: {:system, "NO_MX_LOOKUPS"}}))
-    :ok = SMTPAdapter.deliver(new_email(), config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
     assert gen_smtp_config[:no_mx_lookups]
   end
 
-  test "emails raise an exception when configuration is wrong" do
+  test "deliver raises an exception when username and password configuration are required" do
+    bamboo_email = new_email()
+
+    bamboo_config =
+      configuration(%{
+        username: nil,
+        password: nil,
+        auth: :always
+      })
+
+    assert_raise SMTPAdapter.SMTPError, ~r/no_credentials/, fn ->
+      SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    end
+
+    try do
+      SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    rescue
+      error in SMTPAdapter.SMTPError ->
+        assert {:no_credentials, "Username and password were not provided for authentication."} =
+                 error.raw
+    end
+  end
+
+  test "deliver is successful when username and password are required and present" do
+    bamboo_email = new_email()
+
+    bamboo_config =
+      configuration(%{
+        username: "a",
+        password: "b",
+        auth: :always
+      })
+
+    assert {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+  end
+
+  test "deliver is successful when username and password configuration are not required" do
+    bamboo_email = new_email()
+
+    bamboo_config =
+      configuration(%{
+        username: nil,
+        password: nil,
+        auth: :if_available
+      })
+
+    assert {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+  end
+
+  test "deliver raises an exception when server configuration is wrong" do
     bamboo_email = new_email()
     bamboo_config = configuration(%{server: "wrong.smtp.domain"})
 
@@ -284,6 +350,38 @@ defmodule Bamboo.SMTPAdapterTest do
       error ->
         assert {:retries_exceeded, _detail} = error.raw
     end
+  end
+
+  test "sets default auth key if not present" do
+    %{auth: auth} = SMTPAdapter.handle_config(configuration())
+
+    assert :if_available == auth
+  end
+
+  test "doesn't set a default auth key if present" do
+    %{auth: auth} = SMTPAdapter.handle_config(configuration(%{auth: :always}))
+
+    assert :always == auth
+  end
+
+  test "sets auth if_available from System when specified" do
+    System.put_env("AUTH", "if_available")
+
+    config = SMTPAdapter.handle_config(configuration(%{auth: {:system, "AUTH"}}))
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:auth] == :if_available
+  end
+
+  test "sets auth always from System when specified" do
+    System.put_env("AUTH", "always")
+
+    config = SMTPAdapter.handle_config(configuration(%{auth: {:system, "AUTH"}}))
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    assert gen_smtp_config[:auth] == :always
   end
 
   test "emails raise an exception when email can't be sent" do
@@ -306,7 +404,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email(text_body: nil)
     bamboo_config = configuration()
 
-    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
     assert 1 = length(FakeGenSMTP.fetch_sent_emails)
 
@@ -346,7 +444,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email(subject: nil)
     bamboo_config = configuration()
 
-    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
     assert 1 = length(FakeGenSMTP.fetch_sent_emails)
 
@@ -362,7 +460,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email(html_body: nil)
     bamboo_config = configuration()
 
-    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
     assert 1 = length(FakeGenSMTP.fetch_sent_emails)
 
@@ -401,7 +499,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email()
     bamboo_config = configuration()
 
-    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
     assert 1 = length(FakeGenSMTP.fetch_sent_emails)
 
@@ -439,6 +537,84 @@ defmodule Bamboo.SMTPAdapterTest do
     assert_configuration bamboo_config, gen_smtp_config
   end
 
+  test "email looks fine when no bcc: is set" do
+    bamboo_email = new_email(bcc: [])
+    bamboo_config = configuration()
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    assert 1 = length(FakeGenSMTP.fetch_sent_emails)
+
+    [{{from, to, raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    [multipart_header] =
+      Regex.run(
+        ~r{Content-Type: multipart/alternative; boundary="([^"]+)"\r\n},
+        raw_email,
+        capture: :all_but_first)
+
+    assert format_email_as_string(bamboo_email.from, false) == from
+    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
+
+    rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
+    assert String.contains?(raw_email, rfc822_subject)
+
+    assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
+    assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
+    assert String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
+    refute String.contains?(raw_email, "Bcc: #{format_email_as_string(bamboo_email.bcc)}\r\n")
+    assert String.contains?(raw_email, "Reply-To: reply@doe.com\r\n")
+    assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
+    assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
+                                        "Content-Type: text/html;charset=UTF-8\r\n" <>
+                                        "\r\n" <>
+                                        "#{bamboo_email.html_body}\r\n")
+    assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
+                                        "Content-Type: text/plain;charset=UTF-8\r\n" <>
+                                        "\r\n")
+
+    assert_configuration bamboo_config, gen_smtp_config
+  end
+
+  test "email looks fine when no cc: is set" do
+    bamboo_email = new_email(cc: [])
+    bamboo_config = configuration()
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    assert 1 = length(FakeGenSMTP.fetch_sent_emails)
+
+    [{{from, to, raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
+
+    [multipart_header] =
+      Regex.run(
+        ~r{Content-Type: multipart/alternative; boundary="([^"]+)"\r\n},
+        raw_email,
+        capture: :all_but_first)
+
+    assert format_email_as_string(bamboo_email.from, false) == from
+    assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
+
+    rfc822_subject = "Subject: =?UTF-8?B?SGVsbG8gZnJvbSBCYW1ib28=?=\r\n"
+    assert String.contains?(raw_email, rfc822_subject)
+
+    assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
+    assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
+    refute String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
+    assert String.contains?(raw_email, "Bcc: #{format_email_as_string(bamboo_email.bcc)}\r\n")
+    assert String.contains?(raw_email, "Reply-To: reply@doe.com\r\n")
+    assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
+    assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
+                                        "Content-Type: text/html;charset=UTF-8\r\n" <>
+                                        "\r\n" <>
+                                        "#{bamboo_email.html_body}\r\n")
+    assert String.contains?(raw_email, "--#{multipart_header}\r\n" <>
+                                        "Content-Type: text/plain;charset=UTF-8\r\n" <>
+                                        "\r\n")
+
+    assert_configuration bamboo_config, gen_smtp_config
+  end
+
   test "check rfc822 encoding for subject" do
     bamboo_email = @email_in_utf8
     |> Email.new_email
@@ -446,7 +622,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
     bamboo_config = configuration()
 
-    :ok = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
 
     [{{_from, _to, raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails
 
