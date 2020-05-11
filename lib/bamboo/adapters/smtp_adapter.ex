@@ -39,7 +39,7 @@ defmodule Bamboo.SMTPAdapter do
   @required_configuration [:server, :port]
   @default_configuration %{
     tls: :if_available,
-    ssl: :false,
+    ssl: false,
     retries: 1,
     transport: :gen_smtp_client,
     auth: :if_available
@@ -72,7 +72,7 @@ defmodule Bamboo.SMTPAdapter do
       |> to_gen_smtp_server_config
 
     email
-    |> Bamboo.Mailer.normalize_addresses
+    |> Bamboo.Mailer.normalize_addresses()
     |> to_gen_smtp_message
     |> config[:transport].send_blocking(gen_smtp_config)
     |> handle_response
@@ -133,9 +133,10 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp add_html_body(body, %Bamboo.Email{html_body: html_body}, _multi_part_delimiter)
-  when html_body == nil do
+       when html_body == nil do
     body
   end
+
   defp add_html_body(body, %Bamboo.Email{html_body: html_body}, multi_part_delimiter) do
     base64_html_body = base64_and_split(html_body)
 
@@ -170,9 +171,11 @@ defmodule Bamboo.SMTPAdapter do
   defp add_smtp_header_line(body, type, content) when is_list(content) do
     Enum.reduce(content, body, &add_smtp_header_line(&2, type, &1))
   end
+
   defp add_smtp_header_line(body, type, content) when is_atom(type) do
     add_smtp_header_line(body, String.capitalize(to_string(type)), content)
   end
+
   defp add_smtp_header_line(body, type, content) when is_binary(type) do
     add_smtp_line(body, "#{type}: #{content}")
   end
@@ -182,6 +185,7 @@ defmodule Bamboo.SMTPAdapter do
   defp add_subject(body, %Bamboo.Email{subject: subject}) when is_nil(subject) do
     add_smtp_header_line(body, :subject, "")
   end
+
   defp add_subject(body, %Bamboo.Email{subject: subject}) do
     add_smtp_header_line(body, :subject, rfc822_encode(subject))
   end
@@ -192,16 +196,17 @@ defmodule Bamboo.SMTPAdapter do
 
   def base64_and_split(data) do
     data
-     |> Base.encode64()
-     |> Stream.unfold(&String.split_at(&1, 76))
-     |> Enum.take_while(&(&1 != ""))
-     |> Enum.join("\r\n")
+    |> Base.encode64()
+    |> Stream.unfold(&String.split_at(&1, 76))
+    |> Enum.take_while(&(&1 != ""))
+    |> Enum.join("\r\n")
   end
 
   defp add_text_body(body, %Bamboo.Email{text_body: text_body}, _multi_part_delimiter)
-  when text_body == nil do
+       when text_body == nil do
     body
   end
+
   defp add_text_body(body, %Bamboo.Email{text_body: text_body}, multi_part_delimiter) do
     body
     |> add_multipart_delimiter(multi_part_delimiter)
@@ -210,8 +215,19 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line(text_body)
   end
 
+  defp add_attachment_header(body, %{content_type: content_type} = attachment)
+       when content_type == "message/rfc822" do
+    <<random::size(32)>> = :crypto.strong_rand_bytes(4)
+
+    body
+    |> add_smtp_line("Content-Type: #{attachment.content_type}; name=\"#{attachment.filename}\"")
+    |> add_smtp_line("Content-Disposition: attachment; filename=\"#{attachment.filename}\"")
+    |> add_smtp_line("X-Attachment-Id: #{random}")
+  end
+
   defp add_attachment_header(body, attachment) do
-    << random :: size(32) >> = :crypto.strong_rand_bytes(4)
+    <<random::size(32)>> = :crypto.strong_rand_bytes(4)
+
     body
     |> add_smtp_line("Content-Type: #{attachment.content_type}; name=\"#{attachment.filename}\"")
     |> add_smtp_line("Content-Disposition: attachment; filename=\"#{attachment.filename}\"")
@@ -220,11 +236,18 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp add_attachment_body(body, data) do
-    base64_data = base64_and_split(data)
-    add_smtp_line(body, base64_data)
+    data =
+      if String.contains?(body, "Content-Type: message/rfc822") do
+        data
+      else
+        base64_and_split(data)
+      end
+
+    add_smtp_line(body, data)
   end
 
   defp add_attachment(nil, _), do: ""
+
   defp add_attachment(attachment, multi_part_mixed_delimiter) do
     ""
     |> add_multipart_delimiter(multi_part_mixed_delimiter)
@@ -234,9 +257,12 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp add_attachments(body, %Bamboo.Email{attachments: nil}, _), do: body
+
   defp add_attachments(body, %Bamboo.Email{attachments: attachments}, multi_part_mixed_delimiter) do
     attachment_part =
-      attachments |> Enum.map(fn(attachment) -> add_attachment(attachment, multi_part_mixed_delimiter) end)
+      attachments
+      |> Enum.map(fn attachment -> add_attachment(attachment, multi_part_mixed_delimiter) end)
+
     "#{body}#{attachment_part}"
   end
 
@@ -253,18 +279,20 @@ defmodule Bamboo.SMTPAdapter do
   defp apply_default_configuration({:ok, value}, _default, config) when value != nil do
     config
   end
+
   defp apply_default_configuration(_not_found_value, {key, default_value}, config) do
     Map.put_new(config, key, default_value)
   end
 
   defp generate_multi_part_delimiter do
-    << random1 :: size(32), random2 :: size(32), random3 :: size(32) >> = :crypto.strong_rand_bytes(12)
+    <<random1::size(32), random2::size(32), random3::size(32)>> = :crypto.strong_rand_bytes(12)
     "----=_Part_#{random1}_#{random2}.#{random3}"
   end
 
   defp body(email = %Bamboo.Email{}) do
     multi_part_delimiter = generate_multi_part_delimiter()
     multi_part_mixed_delimiter = generate_multi_part_delimiter()
+
     ""
     |> add_subject(email)
     |> add_from(email)
@@ -286,6 +314,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp build_error({:ok, value}, _key, errors) when value != nil, do: errors
+
   defp build_error(_not_found_value, key, errors) do
     ["Key #{key} is required for SMTP Adapter" | errors]
   end
@@ -299,6 +328,7 @@ defmodule Bamboo.SMTPAdapter do
   defp format_email({nil, email}, _format), do: email
   defp format_email({name, email}, true), do: "#{rfc822_encode(name)} <#{email}>"
   defp format_email({_name, email}, false), do: email
+
   defp format_email(emails, format) when is_list(emails) do
     Enum.map(emails, &format_email(&1, format))
   end
@@ -312,6 +342,7 @@ defmodule Bamboo.SMTPAdapter do
   defp format_email_as_string(emails) when is_list(emails) do
     Enum.join(emails, ", ")
   end
+
   defp format_email_as_string(email) do
     email
   end
@@ -339,10 +370,11 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp raise_on_missing_configuration([], config), do: config
+
   defp raise_on_missing_configuration(errors, config) do
     formatted_errors =
       errors
-      |> Enum.map(&("* #{&1}"))
+      |> Enum.map(&"* #{&1}")
       |> Enum.join("\n")
 
     raise ArgumentError, """
@@ -352,13 +384,13 @@ defmodule Bamboo.SMTPAdapter do
 
     They are required to make the SMTP adapter work. Here you configuration:
 
-    #{inspect config}
+    #{inspect(config)}
     """
   end
 
   defp to_without_format(email = %Bamboo.Email{}) do
     email
-    |> Bamboo.Email.all_recipients
+    |> Bamboo.Email.all_recipients()
     |> format_email(:to, false)
   end
 
@@ -373,75 +405,99 @@ defmodule Bamboo.SMTPAdapter do
   defp to_gen_smtp_server_config({:server, value}, config) when is_binary(value) do
     [{:relay, value} | config]
   end
+
   defp to_gen_smtp_server_config({:username, value}, config) when is_binary(value) do
     [{:username, value} | config]
   end
+
   defp to_gen_smtp_server_config({:password, value}, config) when is_binary(value) do
     [{:password, value} | config]
   end
+
   defp to_gen_smtp_server_config({:tls, "if_available"}, config) do
     [{:tls, :if_available} | config]
   end
+
   defp to_gen_smtp_server_config({:tls, "always"}, config) do
     [{:tls, :always} | config]
   end
+
   defp to_gen_smtp_server_config({:tls, "never"}, config) do
     [{:tls, :never} | config]
   end
+
   defp to_gen_smtp_server_config({:tls, value}, config) when is_atom(value) do
     [{:tls, value} | config]
   end
+
   defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_binary(value) do
     [{:tls_options, [{:versions, string_to_tls_versions(value)}]} | config]
   end
+
   defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_list(value) do
     [{:tls_options, [{:versions, value}]} | config]
   end
+
   defp to_gen_smtp_server_config({:port, value}, config) when is_binary(value) do
     [{:port, String.to_integer(value)} | config]
   end
+
   defp to_gen_smtp_server_config({:port, value}, config) when is_integer(value) do
     [{:port, value} | config]
   end
+
   defp to_gen_smtp_server_config({:ssl, "true"}, config) do
     [{:ssl, true} | config]
   end
+
   defp to_gen_smtp_server_config({:ssl, "false"}, config) do
     [{:ssl, false} | config]
   end
+
   defp to_gen_smtp_server_config({:ssl, value}, config) when is_boolean(value) do
     [{:ssl, value} | config]
   end
+
   defp to_gen_smtp_server_config({:retries, value}, config) when is_binary(value) do
     [{:retries, String.to_integer(value)} | config]
   end
+
   defp to_gen_smtp_server_config({:retries, value}, config) when is_integer(value) do
     [{:retries, value} | config]
   end
+
   defp to_gen_smtp_server_config({:hostname, value}, config) when is_binary(value) do
     [{:hostname, value} | config]
   end
+
   defp to_gen_smtp_server_config({:no_mx_lookups, "true"}, config) do
     [{:no_mx_lookups, true} | config]
   end
+
   defp to_gen_smtp_server_config({:no_mx_lookups, "false"}, config) do
     [{:no_mx_lookups, false} | config]
   end
+
   defp to_gen_smtp_server_config({:no_mx_lookups, value}, config) when is_boolean(value) do
     [{:no_mx_lookups, value} | config]
   end
+
   defp to_gen_smtp_server_config({:auth, "if_available"}, config) do
     [{:auth, :if_available} | config]
   end
+
   defp to_gen_smtp_server_config({:auth, "always"}, config) do
     [{:auth, :always} | config]
   end
+
   defp to_gen_smtp_server_config({:auth, value}, config) when is_atom(value) do
     [{:auth, value} | config]
   end
+
   defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
     to_gen_smtp_server_config({conf, System.get_env(var)}, config)
   end
+
   defp to_gen_smtp_server_config({_key, _value}, config) do
     config
   end
