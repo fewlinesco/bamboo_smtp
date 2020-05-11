@@ -16,7 +16,11 @@ matrix:
       otp_release: 19.3
     - elixir: 1.9.1
       otp_release: 19.3
-
+    - elixir: 1.10.3
+      otp_release: 19.3
+    - elixir: 1.10.3
+      otp_release: 20.3
+    
 cache:
   directories:
     - _build
