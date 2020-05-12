@@ -1,12 +1,5 @@
 # CHANGELOG
 
-## 3.0.0 - 2019-10-14
-
-- After bumping the dependencies, the project requires elixir 1.7 or higher to run ([#139]).
-
-[#130]: https://github.com/fewlinesco/bamboo_smtp/pull/139
-
-
 ## 2.1.0 - 2019-10-14
 
 - SMTPAdapter now does not append `Bcc` and `Cc` headers to the body if there is not any provided ([#130]).
