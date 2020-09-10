@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 3.0.0 - 2020-09-10
+
+- Fix eml attachment ([#137]).
+- Change text/html part to be submitted with base64 encoding to comply to the MIME Format of Internet Message Bodies specification ([#141]).
+- After bumping the dependencies, the project requires elixir 1.7 or higher to run ([#139]).
+
+[#137]: https://github.com/fewlinesco/bamboo_smtp/pull/137
+[#141]: https://github.com/fewlinesco/bamboo_smtp/pull/141
+[#139]: https://github.com/fewlinesco/bamboo_smtp/pull/139
+
+## 2.1.0 - 2019-10-14
+
+- SMTPAdapter now does not append `Bcc` and `Cc` headers to the body if there is not any provided ([#130]).
+- Bump `gen_smtp` version to `~> 0.15.0` ([#129]).
+- Bump `ex_doc` version for system version at least equal to `1.7` ([#127]).
+
+[#130]: https://github.com/fewlinesco/bamboo_smtp/pull/130
+[#129]: https://github.com/fewlinesco/bamboo_smtp/pull/129
+[#127]: https://github.com/fewlinesco/bamboo_smtp/pull/127
+
 ## 2.0.0 - 2019-08-27
 
 - SMTPAdapter now returns the SMTP server response ([#122])
