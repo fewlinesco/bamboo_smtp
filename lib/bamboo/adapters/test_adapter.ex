@@ -1,6 +1,8 @@
 defmodule BambooSMTP.TestAdapter do
   @moduledoc """
-  Used for testing email delivery. Reimplementation of `Bamboo.TestAdapter` with a response more 
+  Based on `Bamboo.TestAdapter`, this module can be used for testing email delivery.
+  
+  The `deliver/2` function will provide a response that follow the format of a SMTP server raw response.
   consistent with elixir conventions and closer to a real request
 
   No emails are sent, instead it sends back `{%Bamboo.Email{...}, {:ok,"<raw_smtp_response>"}}` 
