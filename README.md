@@ -52,6 +52,8 @@ The *hostname* option sets the FQDN to the header of your emails, its optional, 
 
 4. Follow Bamboo [Getting Started Guide](https://github.com/thoughtbot/bamboo#getting-started)
 
+ Optional step: You can also set `BambooSMTP.TestAdapter` as your test adapter if you expect a response that follow the format of a SMTP server raw response on your tests. 
+
 ## Usage
 
 You can find more information about advanced features in the [Wiki](https://github.com/fewlinesco/bamboo_smtp/wiki).
