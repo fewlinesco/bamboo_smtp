@@ -24,7 +24,7 @@ defmodule BambooSMTP.TestAdapter do
 
   @doc false
   def deliver(_email, _config) do
-    send(test_procss(), {:ok, "Ok #{Enum.random(100_000_000..999_999_999)}"})
+    send(test_process(), {:ok, "Ok #{Enum.random(100_000_000..999_999_999)}"})
   end
 
   defp test_process do
