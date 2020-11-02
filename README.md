@@ -1,4 +1,4 @@
-[Optional step: You can also set `BambooSMTP.TestAdapter` as your test adapter if you expect a response that follow the format of a SMTP server raw response on your tests.![Hex pm](https://img.shields.io/hexpm/v/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
+[![Hex pm](https://img.shields.io/hexpm/v/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
 [![Build Status](https://travis-ci.org/fewlinesco/bamboo_smtp.svg?branch=master)](https://travis-ci.org/fewlinesco/bamboo_smtp)
 [![Inline docs](http://inch-ci.org/github/fewlinesco/bamboo_smtp.svg)](http://inch-ci.org/github/fewlinesco/bamboo_smtp)
 
@@ -54,13 +54,12 @@ The *hostname* option sets the FQDN to the header of your emails, its optional, 
 
 5. **Optional** Set `BambooSMTP.TestAdapter` as your test adapter:
 
-```elixir
-# In your config/config.exs file
-if Mix.env() == :test do
-  config :my_app, MyApp.Mailer, adapter: MyApp.SMTPTestAdapter
-end
-```
-
+  ```elixir
+ # In your config/config.exs file
+ if Mix.env() == :test do
+   config :my_app, MyApp.Mailer, adapter: MyApp.SMTPTestAdapter
+ end
+ ```
 ## Usage
 
 You can find more information about advanced features in the [Wiki](https://github.com/fewlinesco/bamboo_smtp/wiki).
