@@ -52,6 +52,14 @@ The *hostname* option sets the FQDN to the header of your emails, its optional, 
 
 4. Follow Bamboo [Getting Started Guide](https://github.com/thoughtbot/bamboo#getting-started)
 
+5. **Optional** Set `BambooSMTP.TestAdapter` as your test adapter:
+
+  ```elixir
+ # In your config/config.exs file
+ if Mix.env() == :test do
+   config :my_app, MyApp.Mailer, adapter: MyApp.SMTPTestAdapter
+ end
+ ```
 ## Usage
 
 You can find more information about advanced features in the [Wiki](https://github.com/fewlinesco/bamboo_smtp/wiki).
