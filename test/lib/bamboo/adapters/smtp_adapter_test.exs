@@ -12,7 +12,7 @@ defmodule Bamboo.SMTPAdapterTest do
       {:ok, args}
     end
 
-    def start_link do
+    def start_link(_) do
       GenServer.start_link(__MODULE__, [], name: __MODULE__)
     end
 
@@ -115,7 +115,7 @@ defmodule Bamboo.SMTPAdapterTest do
   ]
 
   setup do
-    FakeGenSMTP.start_link()
+    start_supervised!(FakeGenSMTP)
 
     :ok
   end
