@@ -678,8 +678,8 @@ defmodule Bamboo.SMTPAdapterTest do
   test "email looks fine when they have non-ASCII characters in subject, from and to" do
     bamboo_email =
       new_email(
-        from: {"Awesome Person 😎", "awesome@person.co"},
-        to: {"Person Awesome 🤩", "person@awesome.co"},
+        from: {"Awesome Person 😎", "awesome@person.local"},
+        to: {"Person Awesome 🤩", "person@awesome.local"},
         subject: "Hello! 👋"
       )
 
