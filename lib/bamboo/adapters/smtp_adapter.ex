@@ -225,7 +225,19 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line(text_body)
   end
 
-  defp add_attachment_header(body, %{content_type: content_type} = attachment)
+  defp add_attachment_header(body, attachment) do
+    case attachment.content_id do
+      nil ->
+        add_common_attachment_header(body, attachment)
+
+      cid ->
+        body
+        |> add_common_attachment_header(attachment)
+        |> add_smtp_line("Content-ID: <#{cid}>")
+    end
+  end
+
+  defp add_common_attachment_header(body, %{content_type: content_type} = attachment)
        when content_type == "message/rfc822" do
     <<random::size(32)>> = :crypto.strong_rand_bytes(4)
 
@@ -235,7 +247,7 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line("X-Attachment-Id: #{random}")
   end
 
-  defp add_attachment_header(body, attachment) do
+  defp add_common_attachment_header(body, attachment) do
     <<random::size(32)>> = :crypto.strong_rand_bytes(4)
 
     body
