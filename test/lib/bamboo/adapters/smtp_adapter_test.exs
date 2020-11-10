@@ -730,6 +730,28 @@ defmodule Bamboo.SMTPAdapterTest do
     assert_configuration(bamboo_config, gen_smtp_config)
   end
 
+  test "email have a Content-ID properly set when attaching files with content_id" do
+    bamboo_email =
+      new_email()
+      |> Bamboo.Email.put_attachment(Path.absname("test/attachments/attachment_one.txt"),
+        content_id: "12345"
+      )
+      |> Bamboo.Email.put_attachment(Path.absname("test/attachments/attachment_two.txt"),
+        content_id: "54321"
+      )
+
+    bamboo_config = configuration()
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    assert 1 = length(FakeGenSMTP.fetch_sent_emails())
+
+    [{{_from, _to, raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+
+    assert Regex.run(~r{Content-ID: <12345>\r\n}, raw_email, capture: :all_but_first)
+    assert Regex.run(~r{Content-ID: <54321>\r\n}, raw_email, capture: :all_but_first)
+  end
+
   test "check rfc822 encoding for subject" do
     bamboo_email =
       @email_in_utf8
