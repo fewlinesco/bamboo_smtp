@@ -108,7 +108,6 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp handle_response(response) do
-    Logger.debug("WTF: #{response} ")
     {:ok, response}
   end
 
