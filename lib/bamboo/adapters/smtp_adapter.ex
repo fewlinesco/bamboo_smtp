@@ -71,11 +71,18 @@ defmodule Bamboo.SMTPAdapter do
       config
       |> to_gen_smtp_server_config
 
-    email
-    |> Bamboo.Mailer.normalize_addresses()
-    |> to_gen_smtp_message
-    |> config[:transport].send_blocking(gen_smtp_config)
-    |> handle_response
+    response =
+      try do
+        email
+        |> Bamboo.Mailer.normalize_addresses()
+        |> to_gen_smtp_message
+        |> config[:transport].send_blocking(gen_smtp_config)
+      catch
+        e ->
+          raise SMTPError, {:not_specified, e}
+      end
+
+    handle_response(response)
   end
 
   @doc false
@@ -94,6 +101,10 @@ defmodule Bamboo.SMTPAdapter do
 
   defp handle_response({:error, reason, detail}) do
     raise SMTPError, {reason, detail}
+  end
+
+  defp handle_response({:error, detail}) do
+    raise SMTPError, {:not_specified, detail}
   end
 
   defp handle_response(response) do
