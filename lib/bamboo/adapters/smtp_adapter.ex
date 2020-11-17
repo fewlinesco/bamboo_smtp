@@ -79,7 +79,7 @@ defmodule Bamboo.SMTPAdapter do
         |> config[:transport].send_blocking(gen_smtp_config)
       catch
         e ->
-          handle_response({:error, e})
+          raise SMTPError, {:not_specified, detail}
       end
 
     handle_response(response)
