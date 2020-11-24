@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## 3.1.0 - 2020-11-23
+
+- Fix for using custom config with `response: true` by bumping `bamboo` version to `~> 1.6` ([#150])
+- Implement our custom test adapter ([#151])
+- Fix CI random failure by attaching FakeGenSMTP Server process to Test supervision tree.([#153])
+- Add Content-ID header when needed([#154])
+- Base 64 encode the headers only when the content contains non-ASCII characters.([#155])
+- Handle `:permanent_failure` exception and re-raising it as a `SMTPError`.([#156])
+- After bumping the dependencies, the project requires([#149]):
+    - credo `~> 1.4.1`
+    - bamboo `~> 1.6`
+    - excoveralls `~> 0.13.3`
+    - gen_smtp  `~> 1.0.1`
+
+[#149]: https://github.com/fewlinesco/bamboo_smtp/pull/149
+[#150]: https://github.com/fewlinesco/bamboo_smtp/pull/150
+[#151]: https://github.com/fewlinesco/bamboo_smtp/pull/151
+[#153]: https://github.com/fewlinesco/bamboo_smtp/pull/153
+[#154]: https://github.com/fewlinesco/bamboo_smtp/pull/154
+[#155]: https://github.com/fewlinesco/bamboo_smtp/pull/155
+[#156]: https://github.com/fewlinesco/bamboo_smtp/pull/156
+
 ## 3.0.0 - 2020-09-10
 
 - Fix eml attachment ([#137]).

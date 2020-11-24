@@ -71,11 +71,18 @@ defmodule Bamboo.SMTPAdapter do
       config
       |> to_gen_smtp_server_config
 
-    email
-    |> Bamboo.Mailer.normalize_addresses()
-    |> to_gen_smtp_message
-    |> config[:transport].send_blocking(gen_smtp_config)
-    |> handle_response
+    response =
+      try do
+        email
+        |> Bamboo.Mailer.normalize_addresses()
+        |> to_gen_smtp_message
+        |> config[:transport].send_blocking(gen_smtp_config)
+      catch
+        e ->
+          raise SMTPError, {:not_specified, e}
+      end
+
+    handle_response(response)
   end
 
   @doc false
@@ -94,6 +101,10 @@ defmodule Bamboo.SMTPAdapter do
 
   defp handle_response({:error, reason, detail}) do
     raise SMTPError, {reason, detail}
+  end
+
+  defp handle_response({:error, detail}) do
+    raise SMTPError, {:not_specified, detail}
   end
 
   defp handle_response(response) do
@@ -191,7 +202,17 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp rfc822_encode(content) do
-    "=?UTF-8?B?#{Base.encode64(content)}?="
+    if contains_only_ascii_characters?(content) do
+      "=?UTF-8?B?#{content}?="
+    else
+      "=?UTF-8?B?#{Base.encode64(content)}?="
+    end
+  end
+
+  defp contains_only_ascii_characters?(content) do
+    content
+    |> String.to_charlist()
+    |> List.ascii_printable?()
   end
 
   def base64_and_split(data) do
@@ -215,7 +236,19 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line(text_body)
   end
 
-  defp add_attachment_header(body, %{content_type: content_type} = attachment)
+  defp add_attachment_header(body, attachment) do
+    case attachment.content_id do
+      nil ->
+        add_common_attachment_header(body, attachment)
+
+      cid ->
+        body
+        |> add_common_attachment_header(attachment)
+        |> add_smtp_line("Content-ID: <#{cid}>")
+    end
+  end
+
+  defp add_common_attachment_header(body, %{content_type: content_type} = attachment)
        when content_type == "message/rfc822" do
     <<random::size(32)>> = :crypto.strong_rand_bytes(4)
 
@@ -225,7 +258,7 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line("X-Attachment-Id: #{random}")
   end
 
-  defp add_attachment_header(body, attachment) do
+  defp add_common_attachment_header(body, attachment) do
     <<random::size(32)>> = :crypto.strong_rand_bytes(4)
 
     body
