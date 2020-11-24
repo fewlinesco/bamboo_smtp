@@ -27,8 +27,6 @@ jobs:
         with:
           path: deps
           key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}
-          restore-keys: |
-            ${{ runner.os }}-mix-
 
       - uses: actions/setup-elixir@v1
         with:
