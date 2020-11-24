@@ -1,5 +1,5 @@
 [![Hex pm](https://img.shields.io/hexpm/v/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
-[![Build Status](https://travis-ci.org/fewlinesco/bamboo_smtp.svg?branch=master)](https://travis-ci.org/fewlinesco/bamboo_smtp)
+[![Build Status](https://github.com/fewlinesco/bamboo_smtp/workflows/Bamboo%20SMTP/badge.svg)](https://github.com/fewlinesco/bamboo_smtp/actions)
 [![Inline docs](http://inch-ci.org/github/fewlinesco/bamboo_smtp.svg)](http://inch-ci.org/github/fewlinesco/bamboo_smtp)
 
 # Bamboo.SMTPAdapter
