@@ -37,4 +37,20 @@ jobs:
       - run: mix compile --warnings-as-errors
       - run: mix credo --strict
       - run: mix test
+
+  doc:
+    name: Generate inch report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+
+      - uses: actions/setup-elixir@v1
+
+      - run: mix deps.get --only docs
       - run: MIX_ENV=docs mix inch.report
