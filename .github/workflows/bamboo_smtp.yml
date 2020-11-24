@@ -4,7 +4,7 @@ on: push
 
 jobs:
   test:
-    name: Bamboo SMTP Test (Elixir ${{ matrix.elixir }} / OTP ${{ matrix.otp }})
+    name: Test on Elixir ${{ matrix.elixir }} / OTP ${{ matrix.otp }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -39,3 +39,4 @@ jobs:
       - run: mix compile --warnings-as-errors
       - run: mix credo --strict
       - run: mix test
+      - run: MIX_ENV=docs mix inch.report
