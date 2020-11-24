@@ -1,0 +1,41 @@
+name: Bamboo SMTP
+
+on: push
+
+jobs:
+  test:
+    name: Bamboo SMTP Test (Elixir ${{ matrix.elixir }} / OTP ${{ matrix.otp }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: [1.7.4, 1.8.2, 1.9.1, 1.10.3]
+        otp: [19.3, 20.3, 21.3, 22.0]
+        exclude:
+          - elixir: 1.8.2
+            otp: 19.3
+          - elixir: 1.9.1
+            otp: 19.3
+          - elixir: 1.10.3
+            otp: 19.3
+          - elixir: 1.10.3
+            otp: 20.3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - run: mix deps.get
+      - run: mix compile --warnings-as-errors
+      - run: mix credo --strict
+      - run: mix test
