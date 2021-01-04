@@ -434,8 +434,7 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from, false) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
-    rfc822_subject = "Subject: =?UTF-8?B?Hello from Bamboo?=\r\n"
-    assert String.contains?(raw_email, rfc822_subject)
+    assert String.contains?(raw_email, "Subject: #{rfc822_encode("Hello from Bamboo")}")
 
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
@@ -473,8 +472,8 @@ defmodule Bamboo.SMTPAdapterTest do
 
     [{{_from, _to, raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
 
-    rfc822_subject = "Subject: \r\n"
-    assert String.contains?(raw_email, rfc822_subject)
+    plain_text = "Subject: \r\n"
+    assert String.contains?(raw_email, plain_text)
 
     assert_configuration(bamboo_config, gen_smtp_config)
   end
@@ -499,9 +498,7 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from, false) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
-    rfc822_subject = "Subject: =?UTF-8?B?Hello from Bamboo?=\r\n"
-    assert String.contains?(raw_email, rfc822_subject)
-
+    assert String.contains?(raw_email, "Subject: #{rfc822_encode("Hello from Bamboo")}")
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
     assert String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
@@ -547,9 +544,7 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from, false) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
-    rfc822_subject = "Subject: =?UTF-8?B?Hello from Bamboo?=\r\n"
-    assert String.contains?(raw_email, rfc822_subject)
-
+    assert String.contains?(raw_email, "Subject: #{rfc822_encode("Hello from Bamboo")}")
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
     assert String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
@@ -597,9 +592,7 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from, false) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
-    rfc822_subject = "Subject: =?UTF-8?B?Hello from Bamboo?=\r\n"
-    assert String.contains?(raw_email, rfc822_subject)
-
+    assert String.contains?(raw_email, "Subject: #{rfc822_encode("Hello from Bamboo")}")
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
     assert String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
@@ -646,9 +639,7 @@ defmodule Bamboo.SMTPAdapterTest do
     assert format_email_as_string(bamboo_email.from, false) == from
     assert format_email(bamboo_email.to ++ bamboo_email.cc ++ bamboo_email.bcc, false) == to
 
-    rfc822_subject = "Subject: =?UTF-8?B?Hello from Bamboo?=\r\n"
-    assert String.contains?(raw_email, rfc822_subject)
-
+    assert String.contains?(raw_email, "Subject: #{rfc822_encode("Hello from Bamboo")}")
     assert String.contains?(raw_email, "From: #{format_email_as_string(bamboo_email.from)}\r\n")
     assert String.contains?(raw_email, "To: #{format_email_as_string(bamboo_email.to)}\r\n")
     refute String.contains?(raw_email, "Cc: #{format_email_as_string(bamboo_email.cc)}\r\n")
@@ -786,17 +777,7 @@ defmodule Bamboo.SMTPAdapterTest do
   end
 
   defp rfc822_encode(content) do
-    if contains_only_ascii_characters?(content) do
-      "=?UTF-8?B?#{content}?="
-    else
-      "=?UTF-8?B?#{Base.encode64(content)}?="
-    end
-  end
-
-  defp contains_only_ascii_characters?(content) do
-    content
-    |> String.to_charlist()
-    |> List.ascii_printable?()
+    "=?UTF-8?B?#{Base.encode64(content)}?="
   end
 
   defp assert_configuration(bamboo_config, gen_smtp_config) do

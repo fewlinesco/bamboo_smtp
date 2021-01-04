@@ -202,17 +202,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp rfc822_encode(content) do
-    if contains_only_ascii_characters?(content) do
-      "=?UTF-8?B?#{content}?="
-    else
-      "=?UTF-8?B?#{Base.encode64(content)}?="
-    end
-  end
-
-  defp contains_only_ascii_characters?(content) do
-    content
-    |> String.to_charlist()
-    |> List.ascii_printable?()
+    "=?UTF-8?B?#{Base.encode64(content)}?="
   end
 
   def base64_and_split(data) do
