@@ -2,11 +2,12 @@ defmodule BambooSmtp.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/fewlinesco/bamboo_smtp"
+  @version "3.1.1"
 
   def project do
     [
       app: :bamboo_smtp,
-      version: "3.1.0",
+      version: @version,
       elixir: "~> 1.7",
       source_url: @project_url,
       homepage_url: @project_url,
@@ -17,7 +18,7 @@ defmodule BambooSmtp.Mixfile do
       test_coverage: [tool: ExCoveralls],
       package: package(),
       deps: deps(),
-      docs: [main: "readme", extras: ["README.md"]]
+      docs: docs()
     ]
   end
 
@@ -27,12 +28,17 @@ defmodule BambooSmtp.Mixfile do
 
   defp deps do
     [
+      # core
       {:bamboo, "~> 1.6"},
-      {:credo, "~> 1.4.1", only: [:dev, :test]},
-      {:earmark, ">= 1.3.2", only: :docs},
-      {:excoveralls, "~> 0.13.3", only: :test},
-      {:ex_doc, ex_doc_version(), only: :docs},
       {:gen_smtp, "~> 1.0.1"},
+
+      # dev / test
+      {:credo, "~> 1.4.1", only: [:dev, :test]},
+      {:excoveralls, "~> 0.13.3", only: :test},
+
+      # doc
+      {:earmark, ">= 1.3.2", only: :docs},
+      {:ex_doc, ex_doc_version(), only: :docs},
       {:inch_ex, "~> 2.0.0", only: :docs}
     ]
   end
@@ -49,7 +55,18 @@ defmodule BambooSmtp.Mixfile do
     [
       maintainers: ["Kevin Disneur", "Thomas Gautier"],
       licenses: ["MIT"],
-      links: %{"GitHub" => @project_url}
+      links: %{
+        "Changelog" => "#{@project_url}/blob/master/CHANGELOG.md",
+        "GitHub" => @project_url
+      }
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_ref: "v#{@version}",
+      extras: ["README.md", "CHANGELOG.md": [title: "Changelog"]]
     ]
   end
 end
