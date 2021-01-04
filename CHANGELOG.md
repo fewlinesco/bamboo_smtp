@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.1 - 2021-01-04
+- Bring back Base64 encoding on headers. Fix issue [#162]
+
+[#162]: https://github.com/fewlinesco/bamboo_smtp/pull/162
 ## 3.1.0 - 2020-11-23
 
 - Fix for using custom config with `response: true` by bumping `bamboo` version to `~> 1.6` ([#150])

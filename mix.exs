@@ -2,7 +2,7 @@ defmodule BambooSmtp.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/fewlinesco/bamboo_smtp"
-  @version "3.1.0"
+  @version "3.1.1"
 
   def project do
     [
@@ -55,7 +55,10 @@ defmodule BambooSmtp.Mixfile do
     [
       maintainers: ["Kevin Disneur", "Thomas Gautier"],
       licenses: ["MIT"],
-      links: %{"Changelog" => "#{@project_url}/blob/master/CHANGELOG.md", "GitHub" => @project_url}
+      links: %{
+        "Changelog" => "#{@project_url}/blob/master/CHANGELOG.md",
+        "GitHub" => @project_url
+      }
     ]
   end
 
