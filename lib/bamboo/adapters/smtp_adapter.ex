@@ -517,6 +517,10 @@ defmodule Bamboo.SMTPAdapter do
     [{:auth, value} | config]
   end
 
+  defp to_gen_smtp_server_config({:sockopts, value}, config) do
+    [{:sockopts, value} | config]
+  end
+
   defp to_gen_smtp_server_config({conf, {:system, var}}, config) do
     to_gen_smtp_server_config({conf, System.get_env(var)}, config)
   end
