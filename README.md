@@ -18,7 +18,7 @@ The package can be installed as:
 
    ```elixir
    def deps do
-     [{:bamboo_smtp, "~> 3.1.0"}]
+     [{:bamboo_smtp, "~> 3.1.2"}]
    end
    ```
 
@@ -50,7 +50,7 @@ The package can be installed as:
    ```
 
    *Sensitive credentials should not be committed to source control and are best kept in environment variables.
-   Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*  
+   Using `{:system, "ENV_NAME"}` configuration is read from the named environment variable at runtime.*
 
    The *hostname* option sets the FQDN to the header of your emails, its optional, but if you don't set it, the underlying `gen_smtp` module will use the hostname of your machine, like `localhost`.
 
