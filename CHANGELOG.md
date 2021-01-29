@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.1.2 - 2021-01-29
+- Enable Bamboo_smtp to work in ipv6-only environment. Fix issue([#143]).
+
+[#143]: https://github.com/fewlinesco/bamboo_smtp/issues/143
 ## 3.1.1 - 2021-01-04
 - Bring back Base64 encoding on headers. Fix issue [#162]
 
