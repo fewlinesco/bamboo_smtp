@@ -29,7 +29,6 @@ defmodule BambooSmtp.Mixfile do
   defp deps do
     [
       # core
-      # {:bamboo, "~> 1.6"},
       {:bamboo, "~> 1.7.0"},
       {:gen_smtp, "~> 1.1.0"},
 
