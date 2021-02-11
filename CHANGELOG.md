@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.1.3 - 2021-02-11
+
+- Update `gen_smtp` dependency from 1.0.1 to 1.1.0 ([#171])
+    - This project now requires Erlang/OTP+20
+
 ## 3.1.2 - 2021-01-29
 - Enable Bamboo_smtp to work in ipv6-only environment. Fix issue([#143]).
 

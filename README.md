@@ -18,7 +18,7 @@ The package can be installed as:
 
    ```elixir
    def deps do
-     [{:bamboo_smtp, "~> 3.1.2"}]
+     [{:bamboo_smtp, "~> 3.1.3"}]
    end
    ```
 
