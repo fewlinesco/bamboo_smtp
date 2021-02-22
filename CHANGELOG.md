@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 4.0.0 - 2021-02-23
+
+- Update `bamboo` dependency from 1.7 to 2.0 (Add Pr #)
+    - Bamboo `deliver_now` and `deliver_later` return `:ok` and `:error` tuples now 
+
 ## 3.1.3 - 2021-02-11
 
 - Update `gen_smtp` dependency from 1.0.1 to 1.1.0 ([#171])
