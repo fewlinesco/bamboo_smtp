@@ -2,7 +2,7 @@ defmodule BambooSmtp.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/fewlinesco/bamboo_smtp"
-  @version "3.1.3"
+  @version "4.0.0"
 
   def project do
     [

@@ -1,8 +1,7 @@
 # CHANGELOG
-
 ## 4.0.0 - 2021-02-23
 
-- Update `bamboo` dependency from 1.7 to 2.0 (Add Pr #)
+- Update `bamboo` dependency from 1.7 to 2.0 ([#177])
     - Bamboo `deliver_now` and `deliver_later` return `:ok` and `:error` tuples now 
 
 ## 3.1.3 - 2021-02-11
