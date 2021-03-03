@@ -1,5 +1,6 @@
 # CHANGELOG
 
+
 ## 3.2.0
 
 - Change the way the adapter handle errors when emails fail to deliver. instead of raising a `SMTPError` we now return an `{:error, %SMTPError{}}` tuple. This is required to accommodate the breaking changes introduced in `bamboo 2.0`([#177]).
@@ -12,6 +13,7 @@
 
 [#177]: https://github.com/fewlinesco/bamboo_smtp/pull/177
 [#178]: https://github.com/fewlinesco/bamboo_smtp/pull/178
+
 ## 3.1.3 - 2021-02-11
 
 - Update `gen_smtp` dependency from 1.0.1 to 1.1.0 ([#171])
