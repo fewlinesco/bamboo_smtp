@@ -33,8 +33,8 @@ defmodule BambooSmtp.Mixfile do
       {:gen_smtp, "~> 1.1.0"},
 
       # dev / test
-      {:credo, "~> 1.4.1", only: [:dev, :test]},
-      {:excoveralls, "~> 0.13.3", only: :test},
+      {:credo, "~> 1.5.0", only: [:dev, :test]},
+      {:excoveralls, "~> 0.14.0", only: :test},
 
       # doc
       {:earmark, ">= 1.3.2", only: :docs},
