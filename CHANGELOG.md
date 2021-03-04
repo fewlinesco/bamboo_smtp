@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 3.2.0
+## 4.0.0
 
 - Change the way the adapter handle errors when emails fail to deliver. instead of raising a `SMTPError` we now return an `{:error, %SMTPError{}}` tuple. This is required to accommodate the breaking changes introduced in `bamboo 2.0`([#177]).
 - After bumping dependencies, the project requires([#178]):
