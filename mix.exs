@@ -2,7 +2,7 @@ defmodule BambooSmtp.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/fewlinesco/bamboo_smtp"
-  @version "3.1.3"
+  @version "4.0.0"
 
   def project do
     [
@@ -29,12 +29,12 @@ defmodule BambooSmtp.Mixfile do
   defp deps do
     [
       # core
-      {:bamboo, "~> 1.7.0"},
+      {:bamboo, "~> 2.0.0"},
       {:gen_smtp, "~> 1.1.0"},
 
       # dev / test
-      {:credo, "~> 1.4.1", only: [:dev, :test]},
-      {:excoveralls, "~> 0.13.3", only: :test},
+      {:credo, "~> 1.5.0", only: [:dev, :test]},
+      {:excoveralls, "~> 0.14.0", only: :test},
 
       # doc
       {:earmark, ">= 1.3.2", only: :docs},
