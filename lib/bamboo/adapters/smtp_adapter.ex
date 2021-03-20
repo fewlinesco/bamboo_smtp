@@ -205,6 +205,10 @@ defmodule Bamboo.SMTPAdapter do
     "=?UTF-8?B?#{Base.encode64(content)}?="
   end
 
+  defp rfc2231_encode(content) do
+    "UTF-8''#{URI.encode(content)}"
+  end
+
   def base64_and_split(data) do
     data
     |> Base.encode64()
@@ -241,19 +245,21 @@ defmodule Bamboo.SMTPAdapter do
   defp add_common_attachment_header(body, %{content_type: content_type} = attachment)
        when content_type == "message/rfc822" do
     <<random::size(32)>> = :crypto.strong_rand_bytes(4)
+    rfc2231_encoded_filename = rfc2231_encode(attachment.filename)
 
     body
-    |> add_smtp_line("Content-Type: #{attachment.content_type}; name=\"#{attachment.filename}\"")
-    |> add_smtp_line("Content-Disposition: attachment; filename=\"#{attachment.filename}\"")
+    |> add_smtp_line("Content-Type: #{attachment.content_type}; name*=#{rfc2231_encoded_filename}")
+    |> add_smtp_line("Content-Disposition: attachment; filename*=#{rfc2231_encoded_filename}")
     |> add_smtp_line("X-Attachment-Id: #{random}")
   end
 
   defp add_common_attachment_header(body, attachment) do
     <<random::size(32)>> = :crypto.strong_rand_bytes(4)
+    rfc2231_encoded_filename = rfc2231_encode(attachment.filename)
 
     body
-    |> add_smtp_line("Content-Type: #{attachment.content_type}; name=\"#{attachment.filename}\"")
-    |> add_smtp_line("Content-Disposition: attachment; filename=\"#{attachment.filename}\"")
+    |> add_smtp_line("Content-Type: #{attachment.content_type}; name*=#{rfc2231_encoded_filename}")
+    |> add_smtp_line("Content-Disposition: attachment; filename*=#{rfc2231_encoded_filename}")
     |> add_smtp_line("Content-Transfer-Encoding: base64")
     |> add_smtp_line("X-Attachment-Id: #{random}")
   end
