@@ -715,6 +715,24 @@ defmodule Bamboo.SMTPAdapterTest do
     assert Regex.run(~r{Content-ID: <54321>\r\n}, raw_email, capture: :all_but_first)
   end
 
+  test "check rfc2231 encoding for attachment filenames" do
+    bamboo_email =
+      new_email()
+      |> Bamboo.Email.put_attachment(Path.absname("test/attachments/attachment_two.txt"), filename: "abcěščřžýáíéúůabc.txt")
+
+    bamboo_config = configuration()
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    [{{_from, _to, raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+
+    rfc2231_name = "name*=UTF-8''abc%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%C3%BD%C3%A1%C3%AD%C3%A9%C3%BA%C5%AFabc.txt\r\n"
+    assert String.contains?(raw_email, rfc2231_name)
+
+    rfc2231_filename = "filename*=UTF-8''abc%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%C3%BD%C3%A1%C3%AD%C3%A9%C3%BA%C5%AFabc.txt\r\n"
+    assert String.contains?(raw_email, rfc2231_filename)
+  end
+
   test "check rfc822 encoding for subject" do
     bamboo_email =
       @email_in_utf8
