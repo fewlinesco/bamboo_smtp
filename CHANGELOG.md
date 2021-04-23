@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## 4.0.1
+- Add support for attachment unicode file names by encoding them using format described in [RFC 2231] ([#183]).
+- After bumping dependencies, the project requires([#185], [#187]):
+   - core:
+      - bamboo, ~> 2.1.0
+      - gen_smtp, ~> 1.1.1
+
+   By bumping `gen_smtp` we fix the issue of errors being raised when sending emails after a STARTTLS.
+
+[RFC 2231]: https://tools.ietf.org/html/rfc2231
+[#183]: https://github.com/fewlinesco/bamboo_smtp/pull/183
+[#185]: https://github.com/fewlinesco/bamboo_smtp/pull/185
+[#187]: https://github.com/fewlinesco/bamboo_smtp/pull/187
+
 ## 4.0.0
 
 - Change the way the adapter handle errors when emails fail to deliver. instead of raising a `SMTPError` we now return an `{:error, %SMTPError{}}` tuple. This is required to accommodate the breaking changes introduced in `bamboo 2.0`([#177]).
