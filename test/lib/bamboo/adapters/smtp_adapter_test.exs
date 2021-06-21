@@ -275,6 +275,18 @@ defmodule Bamboo.SMTPAdapterTest do
     assert [:tlsv1, :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
   end
 
+  test "sets tls connection error log_level" do
+    config =
+      SMTPAdapter.handle_config(
+        configuration(%{tls_log_level: :warning})
+      )
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+    gen_smtp_config
+    assert :warning == gen_smtp_config[:tls_options][:log_level]
+  end
+
   test "sets no_mx_lookups false from System when specified" do
     System.put_env("NO_MX_LOOKUPS", "false")
 
