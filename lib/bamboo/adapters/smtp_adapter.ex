@@ -22,6 +22,11 @@ defmodule Bamboo.SMTPAdapter do
         allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
         # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
         tls_log_level: :error,
+        tls_verify: :verify_peer, # optional, can be `:verify_peer` or `:verify_none`
+        tls_cacertfile: "/somewhere/on/disk", # optional, path to the ca truststore
+        tls_cacerts: "…", # optional, DER-encoded trusted certificates
+        tls_depth: 3, # optional, tls certificate chain depth
+        tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"}, # optional, tls verification function
         ssl: false, # can be `true`,
         retries: 1,
         no_mx_lookups: false, # can be `true`
@@ -47,6 +52,7 @@ defmodule Bamboo.SMTPAdapter do
   }
   @tls_versions ~w(tlsv1 tlsv1.1 tlsv1.2)
   @log_levels [:critical, :error, :warning, :notice]
+  @tls_verify [:verify_peer, :verify_none]
 
   defmodule SMTPError do
     @moduledoc false
@@ -250,7 +256,9 @@ defmodule Bamboo.SMTPAdapter do
     rfc2231_encoded_filename = rfc2231_encode(attachment.filename)
 
     body
-    |> add_smtp_line("Content-Type: #{attachment.content_type}; name*=#{rfc2231_encoded_filename}")
+    |> add_smtp_line(
+      "Content-Type: #{attachment.content_type}; name*=#{rfc2231_encoded_filename}"
+    )
     |> add_smtp_line("Content-Disposition: attachment; filename*=#{rfc2231_encoded_filename}")
     |> add_smtp_line("X-Attachment-Id: #{random}")
   end
@@ -260,7 +268,9 @@ defmodule Bamboo.SMTPAdapter do
     rfc2231_encoded_filename = rfc2231_encode(attachment.filename)
 
     body
-    |> add_smtp_line("Content-Type: #{attachment.content_type}; name*=#{rfc2231_encoded_filename}")
+    |> add_smtp_line(
+      "Content-Type: #{attachment.content_type}; name*=#{rfc2231_encoded_filename}"
+    )
     |> add_smtp_line("Content-Disposition: attachment; filename*=#{rfc2231_encoded_filename}")
     |> add_smtp_line("Content-Transfer-Encoding: base64")
     |> add_smtp_line("X-Attachment-Id: #{random}")
@@ -467,10 +477,43 @@ defmodule Bamboo.SMTPAdapter do
     end)
   end
 
+  defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_list(value) do
+    Keyword.update(config, :tls_options, [{:versions, value}], fn c ->
+      [{:versions, value} | c]
+    end)
+  end
+
   defp to_gen_smtp_server_config({:tls_log_level, value}, config)
        when value in @log_levels do
     Keyword.update(config, :tls_options, [{:log_level, value}], fn c ->
       [{:log_level, value} | c]
+    end)
+  end
+
+  defp to_gen_smtp_server_config({:tls_verify, value}, config) when value in @tls_verify do
+    Keyword.update(config, :tls_options, [{:verify, value}], fn c -> [{:verify, value} | c] end)
+  end
+
+  defp to_gen_smtp_server_config({:tls_cacertfile, value}, config)
+       when is_binary(value) do
+    Keyword.update(config, :tls_options, [{:cacertfile, value}], fn c ->
+      [{:cacertfile, value} | c]
+    end)
+  end
+
+  defp to_gen_smtp_server_config({:tls_cacerts, value}, config)
+       when is_binary(value) do
+    Keyword.update(config, :tls_options, [{:cacerts, value}], fn c -> [{:cacerts, value} | c] end)
+  end
+
+  defp to_gen_smtp_server_config({:tls_depth, value}, config)
+       when is_integer(value) and value >= 0 do
+    Keyword.update(config, :tls_options, [{:depth, value}], fn c -> [{:depth, value} | c] end)
+  end
+
+  defp to_gen_smtp_server_config({:tls_verify_fun, value}, config) when is_tuple(value) do
+    Keyword.update(config, :tls_options, [{:verify_fun, value}], fn c ->
+      [{:verify_fun, value} | c]
     end)
   end
 
