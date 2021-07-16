@@ -421,7 +421,7 @@ defmodule Bamboo.SMTPAdapterTest do
       SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
-  test "emails looks fine when only text body is set" do
+  test "emails looks fine when only html body is set" do
     bamboo_email = new_email(text_body: nil)
     bamboo_config = configuration()
 
@@ -577,6 +577,37 @@ defmodule Bamboo.SMTPAdapterTest do
            )
 
     assert_configuration(bamboo_config, gen_smtp_config)
+  end
+
+  test "emails contain multipart/mixed only when sent with attachments" do
+    bamboo_email = new_email()
+    bamboo_config = configuration()
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    bamboo_email_with_attachments =
+      new_email()
+      |> Bamboo.Email.put_attachment(Path.absname("test/attachments/attachment_two.txt"),
+        filename: "some_attachment.txt"
+      )
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email_with_attachments, bamboo_config)
+
+    assert 2 = length(FakeGenSMTP.fetch_sent_emails())
+
+    [{{_, _, raw_email_2}, _}, {{_, _, raw_email}, _}] = FakeGenSMTP.fetch_sent_emails()
+
+    assert String.contains?(raw_email, "MIME-Version: 1.0\r\n")
+
+    refute String.contains?(
+             raw_email,
+             "multipart/mixed"
+           )
+
+    assert String.contains?(
+             raw_email_2,
+             "multipart/mixed"
+           )
   end
 
   test "email looks fine when no bcc: is set" do
