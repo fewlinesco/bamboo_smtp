@@ -421,7 +421,7 @@ defmodule Bamboo.SMTPAdapterTest do
       SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
-  test "emails looks fine when only text body is set" do
+  test "emails looks fine when only html body is set" do
     bamboo_email = new_email(text_body: nil)
     bamboo_config = configuration()
 
