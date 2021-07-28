@@ -18,7 +18,7 @@ The package can be installed as:
 
    ```elixir
    def deps do
-     [{:bamboo_smtp, "~> 4.0.1"}]
+     [{:bamboo_smtp, "~> 4.1.0"}]
    end
    ```
 
@@ -43,6 +43,12 @@ The package can be installed as:
      password: "pa55word", # or {:system, "SMTP_PASSWORD"}
      tls: :if_available, # can be `:always` or `:never`
      allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"], # or {:system, "ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
+     tls_log_level: :error,
+     tls_verify: :verify_peer, # optional, can be `:verify_peer` or `:verify_none`
+     tls_cacertfile: "/somewhere/on/disk", # optional, path to the ca truststore
+     tls_cacerts: "…", # optional, DER-encoded trusted certificates
+     tls_depth: 3, # optional, tls certificate chain depth
+     tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"}, # optional, tls verification function
      ssl: false, # can be `true`
      retries: 1,
      no_mx_lookups: false, # can be `true`

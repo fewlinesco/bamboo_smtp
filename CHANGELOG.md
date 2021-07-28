@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 4.1.0
+
+- Bump elixir to 1.12.0 and erlang to 24.0 ([#191])
+- Add more options for TLS ([#193], [#196])
+- Dependencies update ([#195]):
+  - core:
+    - bamboo, ~> 2.2.0
+
+[#191]: https://github.com/fewlinesco/bamboo_smtp/pull/191
+[#193]: https://github.com/fewlinesco/bamboo_smtp/pull/193
+[#195]: https://github.com/fewlinesco/bamboo_smtp/pull/195
+[#196]: https://github.com/fewlinesco/bamboo_smtp/pull/196
 
 ## 4.0.1
 - Add support for attachment unicode file names by encoding them using format described in [RFC 2231] ([#183]).

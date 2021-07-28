@@ -275,6 +275,41 @@ defmodule Bamboo.SMTPAdapterTest do
     assert [:tlsv1, :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
   end
 
+  test "sets tls connection error log_level" do
+    config = SMTPAdapter.handle_config(configuration(%{tls_log_level: :warning}))
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+    assert :warning == gen_smtp_config[:tls_options][:log_level]
+  end
+
+  test "sets tls options when specified" do
+    config =
+      SMTPAdapter.handle_config(
+        configuration(%{
+          tls_verify: :verify_peer,
+          tls_cacertfile: "somewhere",
+          tls_cacerts: "…",
+          tls_depth: 99,
+          tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"},
+          allowed_tls_versions: [:tlsv1, :"tlsv1.2"]
+        })
+      )
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+
+    assert :verify_peer == gen_smtp_config[:tls_options][:verify]
+    assert "somewhere" == gen_smtp_config[:tls_options][:cacertfile]
+    assert "…" == gen_smtp_config[:tls_options][:cacerts]
+    assert 99 == gen_smtp_config[:tls_options][:depth]
+
+    assert {&:ssl_verify_hostname.verify_fun/3, [check_hostname: "example.com"]} ==
+             gen_smtp_config[:tls_options][:verify_fun]
+
+    assert [:tlsv1, :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
+  end
+
   test "sets no_mx_lookups false from System when specified" do
     System.put_env("NO_MX_LOOKUPS", "false")
 
@@ -718,7 +753,9 @@ defmodule Bamboo.SMTPAdapterTest do
   test "check rfc2231 encoding for attachment filenames" do
     bamboo_email =
       new_email()
-      |> Bamboo.Email.put_attachment(Path.absname("test/attachments/attachment_two.txt"), filename: "abcěščřžýáíéúůabc.txt")
+      |> Bamboo.Email.put_attachment(Path.absname("test/attachments/attachment_two.txt"),
+        filename: "abcěščřžýáíéúůabc.txt"
+      )
 
     bamboo_config = configuration()
 
@@ -726,10 +763,14 @@ defmodule Bamboo.SMTPAdapterTest do
 
     [{{_from, _to, raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
 
-    rfc2231_name = "name*=UTF-8''abc%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%C3%BD%C3%A1%C3%AD%C3%A9%C3%BA%C5%AFabc.txt\r\n"
+    rfc2231_name =
+      "name*=UTF-8''abc%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%C3%BD%C3%A1%C3%AD%C3%A9%C3%BA%C5%AFabc.txt\r\n"
+
     assert String.contains?(raw_email, rfc2231_name)
 
-    rfc2231_filename = "filename*=UTF-8''abc%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%C3%BD%C3%A1%C3%AD%C3%A9%C3%BA%C5%AFabc.txt\r\n"
+    rfc2231_filename =
+      "filename*=UTF-8''abc%C4%9B%C5%A1%C4%8D%C5%99%C5%BE%C3%BD%C3%A1%C3%AD%C3%A9%C3%BA%C5%AFabc.txt\r\n"
+
     assert String.contains?(raw_email, rfc2231_filename)
   end
 
