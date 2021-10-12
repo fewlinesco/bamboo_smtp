@@ -517,6 +517,12 @@ defmodule Bamboo.SMTPAdapter do
     end)
   end
 
+  defp to_gen_smtp_server_config({:tls_customize_hostname_check, value}, config) do
+    Keyword.update(config, :tls_options, [{:customize_hostname_check, value}], fn c ->
+      [{:customize_hostname_check, value} | c]
+    end)
+  end
+
   defp to_gen_smtp_server_config({:port, value}, config) when is_binary(value) do
     [{:port, String.to_integer(value)} | config]
   end
