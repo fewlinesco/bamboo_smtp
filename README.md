@@ -49,6 +49,7 @@ The package can be installed as:
      tls_cacerts: "…", # optional, DER-encoded trusted certificates
      tls_depth: 3, # optional, tls certificate chain depth
      tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"}, # optional, tls verification function
+     tls_customize_hostname_check: [match_fun: &foo/2], # required if tls_verify is :verify_peer and peer is using a wildcard certificate
      ssl: false, # can be `true`
      retries: 1,
      no_mx_lookups: false, # can be `true`
