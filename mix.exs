@@ -31,6 +31,7 @@ defmodule BambooSmtp.Mixfile do
       # core
       {:bamboo, "~> 2.2.0"},
       {:gen_smtp, github: "gen-smtp/gen_smtp", ref: "a896938fc967f75bc6601d1e9aad80ec27c6b045"},
+      {:ranch, "~> 1.8.0"},
 
       # dev / test
       {:credo, "~> 1.5.0", only: [:dev, :test]},
