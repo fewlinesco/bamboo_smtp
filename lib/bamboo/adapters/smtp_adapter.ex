@@ -20,7 +20,7 @@ defmodule Bamboo.SMTPAdapter do
         password: "pa55word", # or {:system, "SMTP_PASSWORD"}
         tls: :if_available, # can be `:always` or `:never`
         allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
-        # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
+        # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma separated values (e.g. "tlsv1.1,tlsv1.2")
         tls_log_level: :error,
         tls_verify: :verify_peer, # optional, can be `:verify_peer` or `:verify_none`
         tls_cacertfile: "/somewhere/on/disk", # optional, path to the ca truststore
