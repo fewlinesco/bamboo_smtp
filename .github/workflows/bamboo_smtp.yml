@@ -13,24 +13,16 @@ jobs:
     strategy:
       matrix:
         elixir: [1.7.4, 1.8.2, 1.9.1, 1.10.3, 1.11.3, 1.12.3, 1.13.4]
-        otp: [21.3, 22.0, 23.0, 24.0.1]
+        otp: [21.3, 22.3, 23.3, 24.3]
         exclude:
           - elixir: 1.7.4
-            otp: 24.0.1
+            otp: 24.3
           - elixir: 1.8.2
-            otp: 24.0.1
+            otp: 24.3
           - elixir: 1.9.1
-            otp: 24.0.1
-          - elixir: 1.10.3
-            otp: 20.3
-          - elixir: 1.11.3
-            otp: 20.3
-          - elixir: 1.12.3
-            otp: 20.3
+            otp: 24.3
           - elixir: 1.12.3
             otp: 21.3
-          - elixir: 1.13.4
-            otp: 20.3
           - elixir: 1.13.4
             otp: 21.3
     steps:
