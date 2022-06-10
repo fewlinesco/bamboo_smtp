@@ -413,7 +413,7 @@ defmodule Bamboo.SMTPAdapter do
   defp raise_on_missing_configuration([], config), do: config
 
   defp raise_on_missing_configuration(errors, config) do
-    formatted_errors = Enum.map_join(errors, &"* #{&1}", "\n")
+    formatted_errors = Enum.map_join(errors, "\n", &"* #{&1}")
 
     raise ArgumentError, """
     The following settings have not been found in your settings:
