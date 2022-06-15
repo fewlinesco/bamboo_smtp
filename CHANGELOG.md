@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 4.2.0
+
+- Drop testing for OTP ~> 20.3 to align with [gen_smtp minimum otp version of 21](https://github.com/gen-smtp/gen_smtp/blob/99fad81cc3aeb33657ff7598c846c4120c3a480e/rebar.config#L2) ([#205])
+- Bump elixir to 1.13.4 and erlang to 24.3.4 ([#205])
+- Use `Enum.map_join/3` instead of `Enum.map/2 |> Enum.join/2`  ([#205])
+- Dependencies update ([#205]):
+  - core:
+    - gen_smtp, ~> 1.2.0
+  - dev/test:
+    - credo, ~> 1.6.1
+
+[#205]: https://github.com/fewlinesco/bamboo_smtp/pull/205
+
 ## 4.1.0
 
 - Bump elixir to 1.12.0 and erlang to 24.0 ([#191])
@@ -193,7 +206,7 @@ In case you were using the `response: true` option, be aware that you'll now get
 
 ## 1.2.1 - 2016-08-23
 
-* Fix From/To headers passed to gen_smtp not to be formated that caused an error with some SMTP cloud providers like Amazon SES ([#31])
+* Fix From/To headers passed to gen_smtp not to be formatted that caused an error with some SMTP cloud providers like Amazon SES ([#31])
 
 [#31]: https://github.com/fewlinesco/bamboo_smtp/pull/31
 
