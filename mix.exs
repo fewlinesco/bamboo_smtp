@@ -31,7 +31,6 @@ defmodule BambooSmtp.Mixfile do
       # core
       {:bamboo, "~> 2.2.0"},
       {:gen_smtp, "~> 1.2.0"},
-      {:ranch, "2.0.0"},
 
       # dev / test
       {:credo, "~> 1.6.1", only: [:dev, :test]},
