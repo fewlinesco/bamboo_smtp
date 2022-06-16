@@ -2,9 +2,9 @@ name: Bamboo SMTP
 
 on:
   push:
-    branches: [master, develop]
+    branches: [main]
   pull_request:
-    branches: [master, develop]
+    branches: [main]
 
 jobs:
   test:
