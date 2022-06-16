@@ -5,8 +5,8 @@
 [![Module Version](https://img.shields.io/hexpm/v/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/bamboo_smtp/)
 [![Total Download](https://img.shields.io/hexpm/dt/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
-[![License](https://img.shields.io/hexpm/l/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/blob/master/LICENSE)
-[![Last Updated](https://img.shields.io/github/last-commit/fewlinesco/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/commits/master)
+[![License](https://img.shields.io/hexpm/l/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/blob/main/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/fewlinesco/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/commits/main)
 
 An adapter for the [Bamboo](https://github.com/thoughtbot/bamboo) email app.
 

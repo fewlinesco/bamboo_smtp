@@ -56,7 +56,7 @@ defmodule BambooSmtp.Mixfile do
       maintainers: ["Kevin Disneur", "Thomas Gautier"],
       licenses: ["MIT"],
       links: %{
-        "Changelog" => "#{@project_url}/blob/master/CHANGELOG.md",
+        "Changelog" => "#{@project_url}/blob/main/CHANGELOG.md",
         "GitHub" => @project_url
       }
     ]

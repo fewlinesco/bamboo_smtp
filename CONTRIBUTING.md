@@ -9,7 +9,7 @@ Before submitting a Pull Request, please ensure the following:
 1. Your code is covered by tests
 2. Make sure all tests are passing
 3. Only have one commit with a relevant message (you can rebase and squash all your commits into a single one)
-4. Check that you're up to date by rebasing your branch with our `develop` branch
+4. Check that you're up to date by rebasing your branch with our `main` branch
 
 ## Setup
 
