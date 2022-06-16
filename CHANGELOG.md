@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 4.2.1
+
+- Remove explicit ranch dependency #208
+
+[#208]: https://github.com/fewlinesco/bamboo_smtp/pull/208
+
 ## 4.2.0
 
 - Drop testing for OTP ~> 20.3 to align with [gen_smtp minimum otp version of 21](https://github.com/gen-smtp/gen_smtp/blob/99fad81cc3aeb33657ff7598c846c4120c3a480e/rebar.config#L2) ([#205])
