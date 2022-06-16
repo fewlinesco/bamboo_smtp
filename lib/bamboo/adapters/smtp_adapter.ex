@@ -20,7 +20,7 @@ defmodule Bamboo.SMTPAdapter do
         password: "pa55word", # or {:system, "SMTP_PASSWORD"}
         tls: :if_available, # can be `:always` or `:never`
         allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
-        # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
+        # or {":system", ALLOWED_TLS_VERSIONS"} w/ comma separated values (e.g. "tlsv1.1,tlsv1.2")
         tls_log_level: :error,
         tls_verify: :verify_peer, # optional, can be `:verify_peer` or `:verify_none`
         tls_cacertfile: "/somewhere/on/disk", # optional, path to the ca truststore
@@ -418,10 +418,7 @@ defmodule Bamboo.SMTPAdapter do
   defp raise_on_missing_configuration([], config), do: config
 
   defp raise_on_missing_configuration(errors, config) do
-    formatted_errors =
-      errors
-      |> Enum.map(&"* #{&1}")
-      |> Enum.join("\n")
+    formatted_errors = Enum.map_join(errors, "\n", &"* #{&1}")
 
     raise ArgumentError, """
     The following settings have not been found in your settings:
