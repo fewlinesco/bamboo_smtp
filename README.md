@@ -5,8 +5,8 @@
 [![Module Version](https://img.shields.io/hexpm/v/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/bamboo_smtp/)
 [![Total Download](https://img.shields.io/hexpm/dt/bamboo_smtp.svg)](https://hex.pm/packages/bamboo_smtp)
-[![License](https://img.shields.io/hexpm/l/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/blob/master/LICENSE)
-[![Last Updated](https://img.shields.io/github/last-commit/fewlinesco/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/commits/master)
+[![License](https://img.shields.io/hexpm/l/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/blob/main/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/fewlinesco/bamboo_smtp.svg)](https://github.com/fewlinesco/bamboo_smtp/commits/main)
 
 An adapter for the [Bamboo](https://github.com/thoughtbot/bamboo) email app.
 
@@ -18,7 +18,7 @@ The package can be installed as:
 
    ```elixir
    def deps do
-     [{:bamboo_smtp, "~> 4.0.1"}]
+     [{:bamboo_smtp, "~> 4.1.0"}]
    end
    ```
 
@@ -42,11 +42,11 @@ The package can be installed as:
      username: "your.name@your.domain", # or {:system, "SMTP_USERNAME"}
      password: "pa55word", # or {:system, "SMTP_PASSWORD"}
      tls: :if_available, # can be `:always` or `:never`
-     allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"], # or {:system, "ALLOWED_TLS_VERSIONS"} w/ comma seprated values (e.g. "tlsv1.1,tlsv1.2")
+     allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"], # or {:system, "ALLOWED_TLS_VERSIONS"} w/ comma separated values (e.g. "tlsv1.1,tlsv1.2")
      tls_log_level: :error,
      tls_verify: :verify_peer, # optional, can be `:verify_peer` or `:verify_none`
      tls_cacertfile: "/somewhere/on/disk", # optional, path to the ca truststore
-     tls_cacerts: "…", # optional, DER-encoded trusted certificates 
+     tls_cacerts: "…", # optional, DER-encoded trusted certificates
      tls_depth: 3, # optional, tls certificate chain depth
      tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"}, # optional, tls verification function
      ssl: false, # can be `true`
