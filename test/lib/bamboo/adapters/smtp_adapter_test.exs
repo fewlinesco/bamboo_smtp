@@ -292,6 +292,7 @@ defmodule Bamboo.SMTPAdapterTest do
           tls_cacerts: "…",
           tls_depth: 99,
           tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"},
+          tls_customize_hostname_check: [foo: :bar],
           allowed_tls_versions: [:tlsv1, :"tlsv1.2"]
         })
       )
@@ -306,6 +307,8 @@ defmodule Bamboo.SMTPAdapterTest do
 
     assert {&:ssl_verify_hostname.verify_fun/3, [check_hostname: "example.com"]} ==
              gen_smtp_config[:tls_options][:verify_fun]
+
+    assert [foo: :bar] == gen_smtp_config[:tls_options][:customize_hostname_check]
 
     assert [:tlsv1, :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
   end
