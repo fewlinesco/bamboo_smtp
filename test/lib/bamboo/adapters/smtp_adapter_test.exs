@@ -291,6 +291,7 @@ defmodule Bamboo.SMTPAdapterTest do
           tls_cacertfile: "somewhere",
           tls_cacerts: "…",
           tls_depth: 99,
+          tls_server_name_indication: "example.com",
           tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"},
           allowed_tls_versions: [:tlsv1, :"tlsv1.2"]
         })
@@ -300,14 +301,45 @@ defmodule Bamboo.SMTPAdapterTest do
     [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
 
     assert :verify_peer == gen_smtp_config[:tls_options][:verify]
-    assert "somewhere" == gen_smtp_config[:tls_options][:cacertfile]
-    assert "…" == gen_smtp_config[:tls_options][:cacerts]
+    assert 'somewhere' == gen_smtp_config[:tls_options][:cacertfile]
+    assert '…' == gen_smtp_config[:tls_options][:cacerts]
     assert 99 == gen_smtp_config[:tls_options][:depth]
+    assert 'example.com' == gen_smtp_config[:tls_options][:server_name_indication]
 
     assert {&:ssl_verify_hostname.verify_fun/3, [check_hostname: "example.com"]} ==
              gen_smtp_config[:tls_options][:verify_fun]
 
     assert [:tlsv1, :"tlsv1.2"] == gen_smtp_config[:tls_options][:versions]
+  end
+
+  test "sets tls options as socket options when ssl is specified" do
+    config =
+      SMTPAdapter.handle_config(
+        configuration(%{
+          ssl: true,
+          tls_verify: :verify_peer,
+          tls_cacertfile: "somewhere",
+          tls_cacerts: "…",
+          tls_depth: 99,
+          tls_server_name_indication: "example.com",
+          tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"},
+          allowed_tls_versions: [:tlsv1, :"tlsv1.2"]
+        })
+      )
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+
+    assert :verify_peer == gen_smtp_config[:sockopts][:verify]
+    assert 'somewhere' == gen_smtp_config[:sockopts][:cacertfile]
+    assert '…' == gen_smtp_config[:sockopts][:cacerts]
+    assert 99 == gen_smtp_config[:sockopts][:depth]
+    assert 'example.com' == gen_smtp_config[:sockopts][:server_name_indication]
+
+    assert {&:ssl_verify_hostname.verify_fun/3, [check_hostname: "example.com"]} ==
+             gen_smtp_config[:sockopts][:verify_fun]
+
+    assert [:tlsv1, :"tlsv1.2"] == gen_smtp_config[:sockopts][:versions]
   end
 
   test "sets no_mx_lookups false from System when specified" do
