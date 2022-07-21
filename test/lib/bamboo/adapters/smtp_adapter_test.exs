@@ -790,6 +790,19 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, rfc822_subject)
   end
 
+  test "override envelope from" do
+    bamboo_email =
+      new_email()
+      |> Email.put_private(:envelope_from, "foo@bar.com")
+
+    bamboo_config = configuration()
+
+    {:ok, _} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+
+    assert [{{"<foo@bar.com>", _to, _raw_email}, _gen_smtp_config}] =
+             FakeGenSMTP.fetch_sent_emails()
+  end
+
   defp format_email(emails), do: format_email(emails, true)
 
   defp format_email({name, email}, true), do: "#{rfc822_encode(name)} <#{email}>"
