@@ -394,7 +394,11 @@ defmodule Bamboo.SMTPAdapter do
     |> format_email_as_string
   end
 
-  defp from_without_format(%Bamboo.Email{from: from}) do
+  defp envelope_from(%Bamboo.Email{private: %{envelope_from: from}}) do
+    from
+  end
+
+  defp envelope_from(%Bamboo.Email{from: from}) do
     from
     |> format_email(:from, false)
   end
@@ -433,7 +437,7 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   defp to_gen_smtp_message(email = %Bamboo.Email{}) do
-    {from_without_format(email), to_without_format(email), body(email)}
+    {envelope_from(email), to_without_format(email), body(email)}
   end
 
   defp to_gen_smtp_server_config(config) do
