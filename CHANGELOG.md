@@ -1,8 +1,16 @@
 # CHANGELOG
 
+## 4.2.2
+
+- Use punycode for unicode characters in domain name to fix encoding errors ([#198])
+- Update Elixir/OTP compatibility matrix for tests ([#217])
+
+[#198]: https://github.com/fewlinesco/bamboo_smtp/pull/198
+[#217]: https://github.com/fewlinesco/bamboo_smtp/pull/217
+
 ## 4.2.1
 
-- Remove explicit ranch dependency #208
+- Remove explicit ranch dependency ([#208])
 
 [#208]: https://github.com/fewlinesco/bamboo_smtp/pull/208
 
