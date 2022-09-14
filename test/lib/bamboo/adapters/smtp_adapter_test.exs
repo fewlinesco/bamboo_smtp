@@ -3,6 +3,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
   alias Bamboo.Email
   alias Bamboo.SMTPAdapter
+  alias Bamboo.SMTPAdapter.SMTPError
 
   defmodule FakeGenSMTP do
     use GenServer
@@ -344,8 +345,11 @@ defmodule Bamboo.SMTPAdapterTest do
         auth: :always
       })
 
-    assert {:error, "Username and password were not provided for authentication."} =
-             SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    assert {:error,
+            %SMTPError{
+              raw:
+                {:no_credentials, "Username and password were not provided for authentication."}
+            }} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
   test "deliver is successful when username and password are required and present" do
@@ -378,7 +382,8 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email()
     bamboo_config = configuration(%{server: "wrong.smtp.domain"})
 
-    {:error, "wrong.smtp.domain"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:error, %SMTPError{raw: {:not_specified, "wrong.smtp.domain"}}} =
+      SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
   test "sets default auth key if not present" do
@@ -417,7 +422,8 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email(from: {"Wrong User", "wrong@user.com"})
     bamboo_config = configuration()
 
-    {:error, "554 Message rejected: Email address is not verified."} =
+    {:error,
+     %SMTPError{raw: {:not_specified, "554 Message rejected: Email address is not verified."}}} =
       SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
