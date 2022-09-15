@@ -16,10 +16,20 @@ jobs:
         otp: [21.3, 22.3, 23.3, 24.3]
         exclude:
           - elixir: 1.7.4
+            otp: 23.3
+          - elixir: 1.7.4
             otp: 24.3
+          - elixir: 1.8.2
+            otp: 23.3
           - elixir: 1.8.2
             otp: 24.3
           - elixir: 1.9.1
+            otp: 23.3
+          - elixir: 1.9.1
+            otp: 24.3
+          - elixir: 1.10.3
+            otp: 24.3
+          - elixir: 1.11.3
             otp: 24.3
           - elixir: 1.12.3
             otp: 21.3

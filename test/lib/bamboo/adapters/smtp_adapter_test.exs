@@ -100,10 +100,10 @@ defmodule Bamboo.SMTPAdapterTest do
   ]
 
   @email_in_utf8 [
-    from: {"John Doe", "john@doe.com"},
-    to: [{"Jane Doe", "jane@doe.com"}],
-    cc: [{"Richard Roe", "richard@roe.com"}],
-    bcc: [{"Mary Major", "mary@major.com"}, {"Joe Major", "joe@major.com"}],
+    from: {"John Doe", "john@döé.com"},
+    to: [{"Jane Doe", "jane@döé.com"}],
+    cc: [{"Richard Roe", "richard@röé.com"}],
+    bcc: [{"Mary Major", "mary@major.com"}, {"Joe Major", "joe@mãjor.com"}],
     subject: "日本語のｓｕｂｊｅｃｔ",
     html_body: "<h1>Bamboo is awesome!</h1>",
     text_body: "*Bamboo is awesome!*",
@@ -789,6 +789,21 @@ defmodule Bamboo.SMTPAdapterTest do
     rfc822_subject = "Subject: =?UTF-8?B?5pel5pys6Kqe44Gu772T772V772C772K772F772D772U?=\r\n"
     assert String.contains?(raw_email, rfc822_subject)
   end
+
+  test "check punycode of domain part in email address for to, from, bcc and cc" do
+    bamboo_email =
+      @email_in_utf8
+      |> new_email()
+    bamboo_config = configuration()
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    [{{from, to, _raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+    assert from == "john@xn--d-bga2b.com"
+    assert Enum.member?(to, "jane@xn--d-bga2b.com")
+    assert Enum.member?(to, "richard@xn--r-bga2b.com")
+    assert Enum.member?(to, "joe@xn--mjor-goa.com")
+    assert Enum.member?(to, "mary@major.com")
+  end
+
 
   defp format_email(emails), do: format_email(emails, true)
 
