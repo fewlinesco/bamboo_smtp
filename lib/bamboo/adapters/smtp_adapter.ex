@@ -276,6 +276,24 @@ defmodule Bamboo.SMTPAdapter do
     |> add_smtp_line("X-Attachment-Id: #{random}")
   end
 
+  defp add_multipart_attachment_headers(
+         body,
+         %Bamboo.Email{attachments: []},
+         _multi_part_mixed_delimiter
+       ),
+       do: body
+
+  defp add_multipart_attachment_headers(
+         body,
+         %Bamboo.Email{attachments: _attachments},
+         multi_part_mixed_delimiter
+       ) do
+    body
+    |> add_multipart_mixed_header(multi_part_mixed_delimiter)
+    |> add_ending_header
+    |> add_multipart_delimiter(multi_part_mixed_delimiter)
+  end
+
   defp add_attachment_body(body, data) do
     data =
       if String.contains?(body, "Content-Type: message/rfc822") do
@@ -297,14 +315,14 @@ defmodule Bamboo.SMTPAdapter do
     |> add_attachment_body(attachment.data)
   end
 
-  defp add_attachments(body, %Bamboo.Email{attachments: nil}, _), do: body
+  defp add_attachments(body, %Bamboo.Email{attachments: []}, _), do: body
 
   defp add_attachments(body, %Bamboo.Email{attachments: attachments}, multi_part_mixed_delimiter) do
     attachment_part =
       attachments
       |> Enum.map(fn attachment -> add_attachment(attachment, multi_part_mixed_delimiter) end)
 
-    "#{body}#{attachment_part}"
+    add_ending_multipart("#{body}#{attachment_part}", multi_part_mixed_delimiter)
   end
 
   defp add_to(body, %Bamboo.Email{to: recipients}) do
@@ -342,16 +360,13 @@ defmodule Bamboo.SMTPAdapter do
     |> add_to(email)
     |> add_custom_headers(email)
     |> add_mime_header
-    |> add_multipart_mixed_header(multi_part_mixed_delimiter)
-    |> add_ending_header
-    |> add_multipart_delimiter(multi_part_mixed_delimiter)
+    |> add_multipart_attachment_headers(email, multi_part_mixed_delimiter)
     |> add_multipart_header(multi_part_delimiter)
     |> add_ending_header
     |> add_text_body(email, multi_part_delimiter)
     |> add_html_body(email, multi_part_delimiter)
     |> add_ending_multipart(multi_part_delimiter)
     |> add_attachments(email, multi_part_mixed_delimiter)
-    |> add_ending_multipart(multi_part_mixed_delimiter)
   end
 
   defp build_error({:ok, value}, _key, errors) when value != nil, do: errors
