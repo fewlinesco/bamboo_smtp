@@ -104,15 +104,18 @@ defmodule Bamboo.SMTPAdapter do
   def supports_attachments?, do: true
 
   defp handle_response({:error, :no_credentials}) do
-    {:error, "Username and password were not provided for authentication."}
+    {:error,
+     SMTPError.exception(
+       {:no_credentials, "Username and password were not provided for authentication."}
+     )}
   end
 
-  defp handle_response({:error, _reason, detail}) do
-    {:error, detail}
+  defp handle_response({:error, reason, detail}) do
+    {:error, SMTPError.exception({reason, detail})}
   end
 
   defp handle_response({:error, detail}) do
-    {:error, detail}
+    {:error, SMTPError.exception({:not_specified, detail})}
   end
 
   defp handle_response(response) do

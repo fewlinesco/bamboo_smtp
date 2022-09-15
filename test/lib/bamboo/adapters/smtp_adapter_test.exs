@@ -3,6 +3,7 @@ defmodule Bamboo.SMTPAdapterTest do
 
   alias Bamboo.Email
   alias Bamboo.SMTPAdapter
+  alias Bamboo.SMTPAdapter.SMTPError
 
   defmodule FakeGenSMTP do
     use GenServer
@@ -57,7 +58,7 @@ defmodule Bamboo.SMTPAdapterTest do
     defp check_configuration(config) do
       case Keyword.fetch(config, :relay) do
         {:ok, wrong_domain = "wrong.smtp.domain"} ->
-          {:error, wrong_domain}
+          {:error, :retries_exceeded, {:network_failure, wrong_domain, {:error, :nxdomain}}}
 
         _ ->
           :ok
@@ -67,7 +68,9 @@ defmodule Bamboo.SMTPAdapterTest do
     defp check_email({from, _to, _raw}) do
       case from do
         "wrong@user.com" ->
-          {:error, "554 Message rejected: Email address is not verified."}
+          {:error, :no_more_hosts,
+           {:permanent_failure, "an-smtp-adddress",
+            "554 Message rejected: Email address is not verified.\r\n"}}
 
         _ ->
           :ok
@@ -344,8 +347,11 @@ defmodule Bamboo.SMTPAdapterTest do
         auth: :always
       })
 
-    assert {:error, "Username and password were not provided for authentication."} =
-             SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    assert {:error,
+            %SMTPError{
+              raw:
+                {:no_credentials, "Username and password were not provided for authentication."}
+            }} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
   test "deliver is successful when username and password are required and present" do
@@ -378,7 +384,10 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email()
     bamboo_config = configuration(%{server: "wrong.smtp.domain"})
 
-    {:error, "wrong.smtp.domain"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:error,
+     %SMTPError{
+       raw: {:retries_exceeded, {:network_failure, "wrong.smtp.domain", {:error, :nxdomain}}}
+     }} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
   test "sets default auth key if not present" do
@@ -417,8 +426,13 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email = new_email(from: {"Wrong User", "wrong@user.com"})
     bamboo_config = configuration()
 
-    {:error, "554 Message rejected: Email address is not verified."} =
-      SMTPAdapter.deliver(bamboo_email, bamboo_config)
+    {:error,
+     %SMTPError{
+       raw:
+         {:no_more_hosts,
+          {:permanent_failure, "an-smtp-adddress",
+           "554 Message rejected: Email address is not verified.\r\n"}}
+     }} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
   end
 
   test "emails looks fine when only text body is set" do
@@ -794,6 +808,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email =
       @email_in_utf8
       |> new_email()
+
     bamboo_config = configuration()
     {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
     [{{from, to, _raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
@@ -803,7 +818,6 @@ defmodule Bamboo.SMTPAdapterTest do
     assert Enum.member?(to, "joe@xn--mjor-goa.com")
     assert Enum.member?(to, "mary@major.com")
   end
-
 
   defp format_email(emails), do: format_email(emails, true)
 
