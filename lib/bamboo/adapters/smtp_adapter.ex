@@ -75,9 +75,20 @@ defmodule Bamboo.SMTPAdapter do
   end
 
   def deliver(email, config) do
-    gen_smtp_config =
+    tmp_gen_smtp_config =
       config
       |> to_gen_smtp_server_config
+
+    gen_smtp_config =
+      if Keyword.get(tmp_gen_smtp_config, :ssl) == true do
+        tls_options = Keyword.get(tmp_gen_smtp_config, :tls_options, [])
+
+        tmp_gen_smtp_config
+        |> Keyword.put(:sockopts, tls_options)
+        |> Keyword.delete(:tls_options)
+      else
+        tmp_gen_smtp_config
+      end
 
     response =
       try do
@@ -498,13 +509,25 @@ defmodule Bamboo.SMTPAdapter do
 
   defp to_gen_smtp_server_config({:tls_cacertfile, value}, config)
        when is_binary(value) do
+    value = String.to_charlist(value)
+
     Keyword.update(config, :tls_options, [{:cacertfile, value}], fn c ->
       [{:cacertfile, value} | c]
     end)
   end
 
+  defp to_gen_smtp_server_config({:tls_server_name_indication, name}, config)
+       when is_binary(name) do
+    name = String.to_charlist(name)
+
+    Keyword.update(config, :tls_options, [{:server_name_indication, name}], fn c ->
+      [{:server_name_indication, name} | c]
+    end)
+  end
+
   defp to_gen_smtp_server_config({:tls_cacerts, value}, config)
        when is_binary(value) do
+    value = String.to_charlist(value)
     Keyword.update(config, :tls_options, [{:cacerts, value}], fn c -> [{:cacerts, value} | c] end)
   end
 
