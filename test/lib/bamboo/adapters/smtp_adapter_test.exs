@@ -774,6 +774,17 @@ defmodule Bamboo.SMTPAdapterTest do
     assert String.contains?(raw_email, rfc2231_filename)
   end
 
+  test "raw tls_options get passed through" do
+    tls_options = make_ref()
+    bamboo_config = configuration() |> Map.put(:tls_options, tls_options)
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), bamboo_config)
+
+    assert [{_email, config}] = :sys.get_state(Process.whereis(FakeGenSMTP))
+
+    assert config[:tls_options] == tls_options
+  end
+
   test "check rfc822 encoding for subject" do
     bamboo_email =
       @email_in_utf8
@@ -794,6 +805,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email =
       @email_in_utf8
       |> new_email()
+
     bamboo_config = configuration()
     {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
     [{{from, to, _raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
@@ -803,7 +815,6 @@ defmodule Bamboo.SMTPAdapterTest do
     assert Enum.member?(to, "joe@xn--mjor-goa.com")
     assert Enum.member?(to, "mary@major.com")
   end
-
 
   defp format_email(emails), do: format_email(emails, true)
 
