@@ -473,6 +473,10 @@ defmodule Bamboo.SMTPAdapter do
     [{:tls, value} | config]
   end
 
+  defp to_gen_smtp_server_config({:sockopts, value}, config) do
+    Keyword.put(config, :sockopts, value)
+  end
+
   defp to_gen_smtp_server_config({:allowed_tls_versions, value}, config) when is_binary(value) do
     Keyword.update(config, :tls_options, [{:versions, string_to_tls_versions(value)}], fn c ->
       [{:versions, string_to_tls_versions(value)} | c]
