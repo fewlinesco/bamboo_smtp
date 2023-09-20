@@ -283,6 +283,24 @@ defmodule Bamboo.SMTPAdapterTest do
     assert :warning == gen_smtp_config[:tls_options][:log_level]
   end
 
+  test "sets tls connection error log_level when charlist" do
+    config =
+      SMTPAdapter.handle_config(configuration(%{tls_server_name_indication: ~c"example.com"}))
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+    assert ~c"example.com" == gen_smtp_config[:tls_options][:server_name_indication]
+  end
+
+  test "sets tls connection error log_level when binary" do
+    config =
+      SMTPAdapter.handle_config(configuration(%{tls_server_name_indication: "example.com"}))
+
+    {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(new_email(), config)
+    [{{_from, _to, _raw_email}, gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
+    assert ~c"example.com" == gen_smtp_config[:tls_options][:server_name_indication]
+  end
+
   test "sets tls options when specified" do
     config =
       SMTPAdapter.handle_config(
@@ -291,6 +309,7 @@ defmodule Bamboo.SMTPAdapterTest do
           tls_cacertfile: "somewhere",
           tls_cacerts: "…",
           tls_depth: 99,
+          tls_server_name_indication: ~c"alt.example.com",
           tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"},
           allowed_tls_versions: [:tlsv1, :"tlsv1.2"]
         })
@@ -302,6 +321,7 @@ defmodule Bamboo.SMTPAdapterTest do
     assert :verify_peer == gen_smtp_config[:tls_options][:verify]
     assert "somewhere" == gen_smtp_config[:tls_options][:cacertfile]
     assert "…" == gen_smtp_config[:tls_options][:cacerts]
+    assert ~c"alt.example.com" == gen_smtp_config[:tls_options][:server_name_indication]
     assert 99 == gen_smtp_config[:tls_options][:depth]
 
     assert {&:ssl_verify_hostname.verify_fun/3, [check_hostname: "example.com"]} ==
@@ -794,6 +814,7 @@ defmodule Bamboo.SMTPAdapterTest do
     bamboo_email =
       @email_in_utf8
       |> new_email()
+
     bamboo_config = configuration()
     {:ok, "200 Ok 1234567890"} = SMTPAdapter.deliver(bamboo_email, bamboo_config)
     [{{from, to, _raw_email}, _gen_smtp_config}] = FakeGenSMTP.fetch_sent_emails()
@@ -803,7 +824,6 @@ defmodule Bamboo.SMTPAdapterTest do
     assert Enum.member?(to, "joe@xn--mjor-goa.com")
     assert Enum.member?(to, "mary@major.com")
   end
-
 
   defp format_email(emails), do: format_email(emails, true)
 

@@ -48,6 +48,7 @@ The package can be installed as:
      tls_cacertfile: "/somewhere/on/disk", # optional, path to the ca truststore
      tls_cacerts: "…", # optional, DER-encoded trusted certificates
      tls_depth: 3, # optional, tls certificate chain depth
+     tls_server_name_indication: ~c"smtp.domain", #Required for TLS in OTP26
      tls_verify_fun: {&:ssl_verify_hostname.verify_fun/3, check_hostname: "example.com"}, # optional, tls verification function
      ssl: false, # can be `true`
      retries: 1,

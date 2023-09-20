@@ -492,6 +492,17 @@ defmodule Bamboo.SMTPAdapter do
     end)
   end
 
+  defp to_gen_smtp_server_config({:tls_server_name_indication, value}, config)
+       when is_binary(value) do
+    to_gen_smtp_server_config({:tls_server_name_indication, to_charlist(value)}, config)
+  end
+
+  defp to_gen_smtp_server_config({:tls_server_name_indication, value}, config) do
+    Keyword.update(config, :tls_options, [{:server_name_indication, value}], fn c ->
+      [{:server_name_indication, value} | c]
+    end)
+  end
+
   defp to_gen_smtp_server_config({:tls_verify, value}, config) when value in @tls_verify do
     Keyword.update(config, :tls_options, [{:verify, value}], fn c -> [{:verify, value} | c] end)
   end
